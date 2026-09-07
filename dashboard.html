@@ -26,13 +26,13 @@
       background: var(--bg-surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      padding: 14px 16px;
+      padding: 13px 15px;
       display: flex;
       align-items: center;
-      gap: 12px;
-      transition: border-color var(--transition);
+      gap: 11px;
+      transition: border-color var(--transition), box-shadow var(--transition);
     }
-    .db-kpi-card:hover { border-color: var(--border-light); }
+    .db-kpi-card:hover { border-color: var(--border-light); box-shadow: 0 2px 12px rgba(0,0,0,0.4); }
     .db-kpi-icon {
       width: 40px; height: 40px;
       border-radius: var(--radius-md);
@@ -136,17 +136,43 @@
     .db-activity-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
     .db-activity-msg { color: var(--text-secondary); flex: 1; }
 
+    /* ── Ciberseguridad ─────────────────────────────────── */
+    #panel-security { display: none; flex-direction: column; gap: 16px; }
+    #panel-security.active { display: flex; }
+    .sec-log-filters { display: flex; gap: 4px; }
+    .sec-filter-btn { font-size: 10px !important; padding: 4px 8px !important; }
+    .sec-filter-btn.active { background: var(--primary-dim); color: var(--primary); }
+    .sec-domain-chip {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 10px; background: var(--bg-elevated);
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      font-size: 11px; font-family: var(--font-mono);
+    }
+    .sec-perm-chip {
+      display: inline-block; padding: 1px 6px; margin: 1px;
+      background: var(--bg-elevated); border-radius: 4px;
+      font-size: 9px; color: var(--text-muted);
+    }
+    .sec-relation-row {
+      display: flex; flex-direction: column; gap: 3px;
+      padding: 10px 12px; background: var(--bg-elevated);
+      border-radius: var(--radius-md); border: 1px solid var(--border);
+    }
+    .sec-relation-title { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+    .sec-relation-desc { font-size: 11px; color: var(--text-muted); }
+
     /* ── Status bar ─────────────────────────────────────── */
     .status-bar {
       display: flex;
       align-items: center;
-      gap: 16px;
-      padding: 6px 24px;
-      background: var(--bg-surface);
+      gap: 14px;
+      padding: 5px 22px;
+      background: var(--bg-base);
       border-bottom: 1px solid var(--border);
-      font-size: 11px;
+      font-size: 10.5px;
       color: var(--text-muted);
       overflow-x: auto;
+      letter-spacing: 0.01em;
     }
     .status-item {
       display: flex;
@@ -158,17 +184,18 @@
 
     /* ── Chat panel ─────────────────────────────────────── */
     #panel-model {
-      height: calc(100vh - var(--topbar-height) - 24px - 34px - 73px);
+      height: calc(100vh - var(--topbar-height) - 20px - 30px - 66px);
       display: none;
       flex-direction: column;
+      max-height: 620px;  /* panel más compacto */
     }
     #panel-model.active { display: flex; }
 
     .model-shell {
       flex: 1;
       display: grid;
-      grid-template-columns: 1fr 260px;
-      gap: 16px;
+      grid-template-columns: 1fr 240px;
+      gap: 14px;
       overflow: hidden;
     }
 
@@ -185,10 +212,10 @@
     .chat-messages {
       flex: 1;
       overflow-y: auto;
-      padding: 16px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       min-height: 0;
     }
 
@@ -383,12 +410,12 @@
 
     /* Input area */
     .chat-input-area {
-      padding: 12px 16px;
+      padding: 10px 14px;
       border-top: 1px solid var(--border);
       background: var(--bg-surface);
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 7px;
     }
     .chat-image-preview {
       display: flex;
@@ -534,7 +561,7 @@
     .chat-sidebar {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       overflow-y: auto;
       min-height: 0;
     }
@@ -543,12 +570,12 @@
     .pipeline-step {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 9px 12px;
+      gap: 8px;
+      padding: 7px 10px;
       background: var(--bg-elevated);
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
-      font-size: 12px;
+      font-size: 11px;
       color: var(--text-muted);
       transition: all 0.3s ease;
     }
@@ -557,7 +584,7 @@
     .pipeline-step.error  { border-color: var(--danger);  background: var(--danger-dim);  color: var(--danger); }
 
     .pipeline-connector {
-      width: 2px; height: 10px;
+      width: 2px; height: 8px;
       background: var(--border);
       margin: 0 auto;
     }
@@ -725,6 +752,108 @@
       padding: 2px 7px;
       border-radius: 20px;
     }
+
+    /* ── Mejoras visuales globales ──────────────────────── */
+
+    /* Chat — header con fondo levemente diferenciado */
+    .chat-main::before {
+      content: '';
+      display: block;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary) 0%, transparent 100%);
+      opacity: 0.45;
+      flex-shrink: 0;
+    }
+
+    /* Mensajes: burbujas más refinadas */
+    .message-bubble {
+      line-height: 1.62;
+      letter-spacing: 0.005em;
+    }
+    .message.user .message-bubble {
+      background: linear-gradient(135deg, var(--primary) 0%, #0d9e6e 100%);
+      box-shadow: 0 2px 8px rgba(16,185,129,0.22);
+    }
+    .message.assistant .message-bubble {
+      background: var(--bg-elevated);
+      border-color: var(--border-light);
+    }
+
+    /* Avatares más refinados */
+    .message.user .message-avatar {
+      box-shadow: 0 0 0 2px rgba(16,185,129,0.2);
+    }
+
+    /* KPI trend badges */
+    .db-kpi-trend { font-size: 10px; }
+
+    /* db-kpi-icon: sombra interior sutil */
+    .db-kpi-icon {
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+    }
+
+    /* Subsystem row más compacto */
+    .db-ss-row {
+      border-radius: var(--radius-md);
+      transition: background var(--transition);
+    }
+    .db-ss-row:hover { background: var(--bg-hover); }
+
+    /* Topbar: separador del brand mejorado */
+    .topbar-brand {
+      background: linear-gradient(180deg, var(--bg-surface) 0%, rgba(16,185,129,0.03) 100%);
+    }
+
+    /* Sidebar divider más sutil */
+    .sidebar-divider {
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+
+    /* Form inputs: focus ring más visible */
+    .chat-textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-dim);
+    }
+
+    /* Badges: letra más legible */
+    .badge {
+      letter-spacing: 0.01em;
+      font-weight: 600;
+    }
+
+    /* Activity items: hover sutil */
+    .db-activity-item {
+      transition: background var(--transition);
+    }
+    .db-activity-item:hover {
+      background: var(--bg-elevated);
+    }
+
+    /* Metric progress bars: más delgadas y elegantes */
+    .db-metric-bar { height: 3px; }
+
+    /* Scrollbar del chat */
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 2px; }
+    .chat-sidebar::-webkit-scrollbar { width: 4px; }
+
+    /* Topbar time — font ligeramente más pequeño */
+    .topbar-time { font-size: 11px; }
+
+    /* Botón send — más redondeado */
+    .chat-send-btn { border-radius: var(--radius-lg); }
+
+    /* Token hint más sutil */
+    .token-hint { font-size: 9.5px; opacity: 0.7; }
+
+    /* Transición suave al cambiar de panel */
+    .view-panel.active {
+      animation: panelIn 0.18s ease;
+    }
+    @keyframes panelIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
@@ -752,7 +881,7 @@
       <span class="topbar-time font-mono text-sm" id="topbar-time">--:--:--</span>
       <span class="badge badge-success flex items-center gap-1" title="Modelo activo">
         <span class="status-dot online" style="width:5px;height:5px;box-shadow:none;"></span>
-        ${CONFIG.model.id}
+        <span id="topbar-model-id">${CONFIG.model.id}</span>
       </span>
       <div class="topbar-user" id="topbar-user" title="Usuario activo" style="cursor:default;">
         <div class="topbar-avatar" id="topbar-avatar">--</div>
@@ -803,6 +932,66 @@
     <div class="sidebar-section">
       <div class="sidebar-section-label">Subsistemas</div>
 
+      <!-- Fuente de Datos: visible para todos los roles -->
+      <div class="sidebar-item" data-view="fuente" data-perm="dashboard" onclick="UI.navigate(this)">
+        <div class="sidebar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+          </svg>
+        </div>
+        <span class="sidebar-label">Fuente de Datos</span>
+      </div>
+
+      <!-- Procesamiento: visible para todos los roles -->
+      <div class="sidebar-item" data-view="procesamiento" data-perm="dashboard" onclick="UI.navigate(this)">
+        <div class="sidebar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"/><path d="M12 8v4l3 3"/>
+          </svg>
+        </div>
+        <span class="sidebar-label">Procesamiento</span>
+      </div>
+
+      <!-- Conexion de Datos: visible para todos los roles -->
+      <div class="sidebar-item" data-view="conexion" data-perm="dashboard" onclick="UI.navigate(this)">
+        <div class="sidebar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/>
+          </svg>
+        </div>
+        <span class="sidebar-label">Conexion de Datos</span>
+      </div>
+
+      <!-- Almacenamiento: visible para todos los roles -->
+      <div class="sidebar-item" data-view="almacen" data-perm="dashboard" onclick="UI.navigate(this)">
+        <div class="sidebar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v6c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 11v6c0 1.66 4 3 9 3s9-1.34 9-3v-6"/>
+          </svg>
+        </div>
+        <span class="sidebar-label">Almacenamiento</span>
+      </div>
+
+      <!-- Postprocesamiento: visible para todos los roles -->
+      <div class="sidebar-item" data-view="postproc" data-perm="dashboard" onclick="UI.navigate(this)">
+        <div class="sidebar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+        </div>
+        <span class="sidebar-label">Postprocesamiento</span>
+      </div>
+
+      <!-- Interfaz / UI: visible para todos los roles -->
+      <div class="sidebar-item" data-view="interfaz" data-perm="dashboard" onclick="UI.navigate(this)">
+        <div class="sidebar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+        </div>
+        <span class="sidebar-label">Interfaz / UI</span>
+      </div>
+
       <!-- Servidores: permiso 'servers' — CU-2 -->
       <div class="sidebar-item" data-view="servers" data-perm="servers" onclick="UI.navigate(this)">
         <div class="sidebar-icon">
@@ -823,6 +1012,16 @@
           </svg>
         </div>
         <span class="sidebar-label">Entrenamiento IA</span>
+      </div>
+
+      <!-- Ciberseguridad: permiso 'security' — CU-3 -->
+      <div class="sidebar-item" data-view="security" data-perm="security" onclick="UI.navigate(this)">
+        <div class="sidebar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <span class="sidebar-label">Ciberseguridad</span>
       </div>
     </div>
 
@@ -945,7 +1144,7 @@
                 </div>
                 <div>
                   <div style="font-size:13px;font-weight:600;color:var(--text-primary);" id="db-model-name">${CONFIG.model.id}</div>
-                  <div style="font-size:11px;color:var(--text-muted);">Google AI Studio</div>
+                  <div style="font-size:11px;color:var(--text-muted);">Open Router</div>
                 </div>
               </div>
 
@@ -975,6 +1174,546 @@
 
       </div>
       <!-- /panel-dashboard -->
+
+      <!-- ═══════════════════════════════════════════════════
+           PANEL: Fuente de Datos (SIMULADO)
+           Componentes segun documento: Base de datos principal,
+           Fuentes externas. Punto de entrada del flujo de info.
+      ════════════════════════════════════════════════════ -->
+      <div class="view-panel" id="panel-fuente">
+
+        <div class="sim-banner">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          Subsistema simulado — no se conecta a fuentes reales. Sirve para verificar el flujo visto en el documento.
+        </div>
+
+        <div class="db-kpi-row" style="margin-bottom:16px;">
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--primary-dim);color:var(--primary);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Registros en BD principal</div>
+              <div class="db-kpi-value" id="fd-kpi-records">0</div>
+            </div>
+            <div class="db-kpi-trend up" id="fd-kpi-records-trend">— sesion actual</div>
+          </div>
+
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--success-dim);color:var(--success);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Fuentes externas online</div>
+              <div class="db-kpi-value" id="fd-kpi-sources">0 / 0</div>
+            </div>
+            <div class="db-kpi-trend up">conectadas</div>
+          </div>
+
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--info-dim);color:var(--info);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Ultimo registro</div>
+              <div class="db-kpi-value font-mono" id="fd-kpi-last" style="font-size:14px;">—</div>
+            </div>
+            <div class="db-kpi-trend">hora local</div>
+          </div>
+        </div>
+
+        <div class="db-mid-row" style="align-items:flex-start;">
+
+          <div class="card" style="flex:1.3;">
+            <div class="card-header">
+              <span class="card-title">Base de Datos Principal</span>
+              <button class="btn btn-primary btn-sm" id="fd-btn-simulate" style="font-size:11px;">
+                + Simular nueva entrada de datos
+              </button>
+            </div>
+            <div class="card-body" style="padding:0;max-height:340px;overflow-y:auto;">
+              <table class="fd-table">
+                <thead>
+                  <tr><th>ID</th><th>Fuente</th><th>Tipo</th><th>Tamaño</th><th>Hora</th><th>Estado</th></tr>
+                </thead>
+                <tbody id="fd-records-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card" style="flex:1;">
+            <div class="card-header">
+              <span class="card-title">Fuentes Externas</span>
+            </div>
+            <div class="card-body" style="padding:12px;display:flex;flex-direction:column;gap:8px;" id="fd-sources-list"></div>
+          </div>
+
+        </div>
+
+        <div class="card" style="margin-top:16px;">
+          <div class="card-header">
+            <span class="card-title">Flujo hacia Procesamiento</span>
+            <span class="text-muted" style="font-size:10px;">se activa al generar o recibir un registro</span>
+          </div>
+          <div class="card-body" style="padding:16px;display:flex;align-items:center;gap:10px;" id="fd-flow-row">
+            <div class="fd-flow-node" id="fd-flow-fuente">Fuente de Datos</div>
+            <div class="fd-flow-arrow">→</div>
+            <div class="fd-flow-node dim" id="fd-flow-proc">Procesamiento</div>
+            <div class="fd-flow-arrow">→</div>
+            <div class="fd-flow-node dim" id="fd-flow-conn">Conexion de Datos</div>
+          </div>
+        </div>
+
+      </div>
+      <!-- /panel-fuente -->
+
+      <!-- ═══════════════════════════════════════════════════
+           PANEL: Procesamiento (SIMULADO)
+           Componentes segun documento: Validador de datos,
+           Normalizador, Transformador.
+      ════════════════════════════════════════════════════ -->
+      <div class="view-panel" id="panel-procesamiento">
+
+        <div class="sim-banner">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          Subsistema simulado — muestra paso a paso la validacion, normalizacion y transformacion de los datos.
+        </div>
+
+        <div class="db-kpi-row" style="margin-bottom:16px;">
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--primary-dim);color:var(--primary);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Registros procesados</div>
+              <div class="db-kpi-value" id="pr-kpi-processed">0</div>
+            </div>
+            <div class="db-kpi-trend up">sesion actual</div>
+          </div>
+
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--danger-dim);color:var(--danger);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Rechazados por validacion</div>
+              <div class="db-kpi-value" id="pr-kpi-rejected">0</div>
+            </div>
+            <div class="db-kpi-trend">datos corruptos/incompletos</div>
+          </div>
+
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--info-dim);color:var(--info);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Tiempo promedio</div>
+              <div class="db-kpi-value font-mono" id="pr-kpi-avgtime">— ms</div>
+            </div>
+            <div class="db-kpi-trend">por registro</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-header">
+            <span class="card-title">Pipeline de Procesamiento</span>
+            <button class="btn btn-primary btn-sm" id="pr-btn-process" style="font-size:11px;">
+              ▶ Procesar siguiente registro
+            </button>
+          </div>
+          <div class="card-body" style="padding:20px;">
+            <div class="pr-stage-row">
+              <div class="pr-stage" id="pr-stage-validador">
+                <div class="pr-stage-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </div>
+                <div class="pr-stage-label">Validador de Datos</div>
+                <div class="pr-stage-sub">Integridad, formato, completitud</div>
+              </div>
+              <div class="pr-stage-arrow">→</div>
+              <div class="pr-stage" id="pr-stage-normalizador">
+                <div class="pr-stage-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V9l8-6 8 6v12"/><path d="M9 21v-6h6v6"/></svg>
+                </div>
+                <div class="pr-stage-label">Normalizador</div>
+                <div class="pr-stage-sub">Formatos consistentes</div>
+              </div>
+              <div class="pr-stage-arrow">→</div>
+              <div class="pr-stage" id="pr-stage-transformador">
+                <div class="pr-stage-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                </div>
+                <div class="pr-stage-label">Transformador</div>
+                <div class="pr-stage-sub">Limpieza y enriquecimiento</div>
+              </div>
+            </div>
+
+            <div class="pr-log-box" id="pr-log-box">
+              <span class="text-muted">Presiona "Procesar siguiente registro" para ver el detalle de cada etapa...</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Registros Procesados (listos para Conexion de Datos)</span>
+            <span class="text-muted" style="font-size:10px;" id="pr-processed-count">0 registros</span>
+          </div>
+          <div class="card-body" style="padding:0;max-height:220px;overflow-y:auto;">
+            <table class="fd-table">
+              <thead>
+                <tr><th>ID</th><th>Etapas OK</th><th>Resultado</th><th>Duracion</th><th>Hora</th></tr>
+              </thead>
+              <tbody id="pr-processed-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+      <!-- /panel-procesamiento -->
+
+      <!-- ═══════════════════════════════════════════════════
+           PANEL: Conexion de Datos (SIMULADO)
+           Componentes segun documento: Canales de comunicacion,
+           Validador de integridad.
+      ════════════════════════════════════════════════════ -->
+      <div class="view-panel" id="panel-conexion">
+
+        <div class="sim-banner">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          Subsistema simulado — Coordina la comunicación entre los subsistemas y verifica la integridad de la información.
+        </div>
+
+        <div class="db-kpi-row" style="margin-bottom:16px;">
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--primary-dim);color:var(--primary);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Paquetes transmitidos</div>
+              <div class="db-kpi-value" id="cx-kpi-packets">0</div>
+            </div>
+            <div class="db-kpi-trend up">sesion actual</div>
+          </div>
+
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--danger-dim);color:var(--danger);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Paquetes corruptos</div>
+              <div class="db-kpi-value" id="cx-kpi-corrupt">0</div>
+            </div>
+            <div class="db-kpi-trend">detectados por el validador</div>
+          </div>
+
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--info-dim);color:var(--info);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Throughput</div>
+              <div class="db-kpi-value font-mono" id="cx-kpi-throughput">— Mb/s</div>
+            </div>
+            <div class="db-kpi-trend">promedio del canal activo</div>
+          </div>
+        </div>
+
+        <div class="db-mid-row" style="align-items:flex-start;">
+
+          <div class="card" style="flex:1.3;">
+            <div class="card-header">
+              <span class="card-title">Canales de Comunicacion</span>
+              <button class="btn btn-primary btn-sm" id="cx-btn-send" style="font-size:11px;">
+                ▶ Enviar paquete de datos
+              </button>
+            </div>
+            <div class="card-body" style="padding:16px;">
+              <div class="cx-canvas" id="cx-canvas">
+                <div class="cx-node" id="cx-node-proc">Procesamiento</div>
+                <div class="cx-node" id="cx-node-conn">Conexion<br/>de Datos</div>
+                <div class="cx-node" id="cx-node-sec">Ciberseguridad</div>
+                <div class="cx-node" id="cx-node-srv">Servidores<br/>Distribuidos</div>
+                <div class="cx-track" id="cx-track"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="flex:1;">
+            <div class="card-header">
+              <span class="card-title">Validador de Integridad</span>
+            </div>
+            <div class="card-body" style="padding:0;max-height:280px;overflow-y:auto;" id="cx-log-list"></div>
+          </div>
+
+        </div>
+
+      </div>
+      <!-- /panel-conexion -->
+
+      <!-- ═══════════════════════════════════════════════════
+           PANEL: Almacenamiento (DATOS REALES)
+           Componentes segun documento: Base de datos de
+           resultados (= historial real cifrado del modelo),
+           Cache de modelos (= versiones reales entrenadas
+           en el panel de Entrenamiento).
+      ════════════════════════════════════════════════════ -->
+      <div class="view-panel" id="panel-almacen">
+
+        <div class="sim-banner" style="background:var(--success-dim);color:var(--success);border-color:rgba(16,185,129,0.3);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Subsistema funcional real — muestra el historial cifrado de consultas y las versiones de modelo realmente generadas en esta sesion.
+        </div>
+
+        <div class="db-kpi-row" style="margin-bottom:16px;">
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--primary-dim);color:var(--primary);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v6c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 11v6c0 1.66 4 3 9 3s9-1.34 9-3v-6"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Resultados guardados</div>
+              <div class="db-kpi-value" id="al-kpi-results">0</div>
+            </div>
+            <div class="db-kpi-trend up">historial cifrado (AES-256-GCM)</div>
+          </div>
+
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--success-dim);color:var(--success);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Versiones en cache</div>
+              <div class="db-kpi-value" id="al-kpi-versions">0</div>
+            </div>
+            <div class="db-kpi-trend">generadas en Entrenamiento IA</div>
+          </div>
+
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--info-dim);color:var(--info);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Tamaño aproximado</div>
+              <div class="db-kpi-value font-mono" id="al-kpi-size">0 KB</div>
+            </div>
+            <div class="db-kpi-trend">localStorage cifrado</div>
+          </div>
+        </div>
+
+        <div class="db-mid-row" style="align-items:flex-start;">
+
+          <div class="card" style="flex:1.3;">
+            <div class="card-header">
+              <span class="card-title">Base de Datos de Resultados</span>
+              <button class="btn btn-ghost btn-sm" id="al-btn-refresh" style="font-size:11px;">Actualizar</button>
+            </div>
+            <div class="card-body" style="padding:0;max-height:360px;overflow-y:auto;" id="al-results-list"></div>
+          </div>
+
+          <div class="card" style="flex:1;">
+            <div class="card-header">
+              <span class="card-title">Cache de Modelos</span>
+              <span class="text-muted" style="font-size:10px;">version activa marcada</span>
+            </div>
+            <div class="card-body" style="padding:12px;display:flex;flex-direction:column;gap:8px;" id="al-cache-list"></div>
+          </div>
+
+        </div>
+
+      </div>
+      <!-- /panel-almacen -->
+
+      <!-- ═══════════════════════════════════════════════════
+           PANEL: Postprocesamiento (FUNCIONAL REAL)
+           Componentes segun documento: Formateador de
+           resultados, Generador de reportes. Trabaja sobre
+           el historial REAL guardado en Almacenamiento.
+      ════════════════════════════════════════════════════ -->
+      <div class="view-panel" id="panel-postproc">
+
+        <div class="sim-banner" style="background:var(--success-dim);color:var(--success);border-color:rgba(16,185,129,0.3);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Subsistema funcional real — formatea y genera reportes descargables a partir del historial real de resultados del modelo.
+        </div>
+
+        <div class="db-kpi-row" style="margin-bottom:16px;">
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--primary-dim);color:var(--primary);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Resultados disponibles</div>
+              <div class="db-kpi-value" id="pp-kpi-available">0</div>
+            </div>
+            <div class="db-kpi-trend up">desde Almacenamiento</div>
+          </div>
+
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--success-dim);color:var(--success);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Reportes generados</div>
+              <div class="db-kpi-value" id="pp-kpi-reports">0</div>
+            </div>
+            <div class="db-kpi-trend">sesion actual</div>
+          </div>
+
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--info-dim);color:var(--info);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Ultimo formateo</div>
+              <div class="db-kpi-value font-mono" id="pp-kpi-last" style="font-size:14px;">—</div>
+            </div>
+            <div class="db-kpi-trend">hora local</div>
+          </div>
+        </div>
+
+        <div class="db-mid-row" style="align-items:flex-start;">
+
+          <div class="card" style="flex:1.3;">
+            <div class="card-header">
+              <span class="card-title">Formateador de Resultados</span>
+              <button class="btn btn-ghost btn-sm" id="pp-btn-refresh" style="font-size:11px;">Actualizar</button>
+            </div>
+            <div class="card-body" style="padding:0;max-height:340px;overflow-y:auto;" id="pp-formatted-list"></div>
+          </div>
+
+          <div class="card" style="flex:1;">
+            <div class="card-header">
+              <span class="card-title">Generador de Reportes</span>
+            </div>
+            <div class="card-body" style="padding:14px;display:flex;flex-direction:column;gap:10px;">
+              <div style="font-size:12px;color:var(--text-secondary);">
+                Genera un reporte descargable (.html) con los resultados formateados del historial real del modelo.
+              </div>
+
+              <label style="font-size:11px;color:var(--text-muted);display:flex;flex-direction:column;gap:4px;">
+                Cantidad de resultados a incluir
+                <select class="form-select-styled" id="pp-report-count" style="font-size:12px;">
+                  <option value="5">Ultimos 5</option>
+                  <option value="10" selected>Ultimos 10</option>
+                  <option value="25">Ultimos 25</option>
+                  <option value="0">Todos</option>
+                </select>
+              </label>
+
+              <button class="btn btn-primary btn-sm" id="pp-btn-generate" style="width:100%;justify-content:center;font-size:12px;">
+                ⬇ Generar y descargar reporte
+              </button>
+
+              <div id="pp-report-status" style="font-size:11px;color:var(--text-muted);"></div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+      <!-- /panel-postproc -->
+
+      <!-- ═══════════════════════════════════════════════════
+           PANEL: Interfaz / UI (FUNCIONAL REAL)
+           Componentes segun documento: Dashboard interactivo,
+           Portal de entrada de datos. Cierra el ciclo de
+           retroalimentacion (linea punteada) hacia
+           Procesamiento / Modelo IA descrito en el documento.
+      ════════════════════════════════════════════════════ -->
+      <div class="view-panel" id="panel-interfaz">
+
+        <div class="sim-banner" style="background:var(--success-dim);color:var(--success);border-color:rgba(16,185,129,0.3);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Subsistema funcional real — refleja el uso real de esta sesion: consultas, adjuntos y retroalimentacion enviada por el usuario.
+        </div>
+
+        <div class="db-kpi-row" style="margin-bottom:16px;">
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--primary-dim);color:var(--primary);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Consultas via Portal</div>
+              <div class="db-kpi-value" id="ui-kpi-queries">0</div>
+            </div>
+            <div class="db-kpi-trend up">sesion actual</div>
+          </div>
+
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--info-dim);color:var(--info);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Adjuntos recibidos</div>
+              <div class="db-kpi-value" id="ui-kpi-images">0</div>
+            </div>
+            <div class="db-kpi-trend">portal de entrada</div>
+          </div>
+
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--warning-dim);color:var(--warning);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Retroalimentacion promedio</div>
+              <div class="db-kpi-value font-mono" id="ui-kpi-feedback">— ★</div>
+            </div>
+            <div class="db-kpi-trend" id="ui-kpi-feedback-count">0 envios</div>
+          </div>
+        </div>
+
+        <div class="db-mid-row" style="align-items:flex-start;">
+
+          <div class="card" style="flex:1.2;">
+            <div class="card-header">
+              <span class="card-title">Componentes de Interfaz / UI</span>
+            </div>
+            <div class="card-body" style="padding:16px;display:flex;flex-direction:column;gap:12px;">
+              <div class="ui-comp-item">
+                <div class="ui-comp-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                </div>
+                <div>
+                  <div class="ui-comp-title">Dashboard interactivo</div>
+                  <div class="ui-comp-sub">Este panel: metricas, subsistemas y actividad en tiempo real.</div>
+                </div>
+              </div>
+              <div class="ui-comp-item">
+                <div class="ui-comp-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <div>
+                  <div class="ui-comp-title">Portal de entrada de datos</div>
+                  <div class="ui-comp-sub">Formulario de chat en "Modelo IA / MML" — texto, imagenes y documentos.</div>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="UI.goTo('model')" style="align-self:flex-start;font-size:11px;">
+                Ir al Portal de Entrada →
+              </button>
+            </div>
+          </div>
+
+          <div class="card" style="flex:1;">
+            <div class="card-header">
+              <span class="card-title">Ciclo de Retroalimentacion</span>
+            </div>
+            <div class="card-body" style="padding:16px;">
+              <div class="ui-loop">
+                <div class="ui-loop-node">Interfaz / UI</div>
+                <div class="ui-loop-arrow">⇢</div>
+                <div class="ui-loop-node">Procesamiento /<br/>Modelo IA</div>
+              </div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:10px;">
+                Las interacciones del usuario (calificaciones, comentarios) regresan como retroalimentacion real, guardada cifrada junto a los resultados.
+              </div>
+              <div id="ui-recent-feedback" style="margin-top:12px;display:flex;flex-direction:column;gap:6px;"></div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+      <!-- /panel-interfaz -->
 
       <!-- ═══════════════════════════════════════════════════
            PANEL: Modelo IA / MML — CU-1 + CU-5
@@ -1043,10 +1782,10 @@
           <div class="chat-sidebar">
 
             <div class="card">
-              <div class="card-header" style="padding:12px 16px;">
-                <span class="card-title" style="font-size:11px;">Flujo de Subsistemas (Documento)</span>
+              <div class="card-header" style="padding:10px 14px;">
+                <span class="card-title">Flujo de Subsistemas</span>
               </div>
-              <div class="card-body" style="padding:12px;display:flex;flex-direction:column;gap:4px;">
+              <div class="card-body" style="padding:10px;display:flex;flex-direction:column;gap:3px;">
                 <div class="pipeline-step" id="ps-input" title="Portal de entrada de datos">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
                   Fuente de Datos
@@ -1085,10 +1824,10 @@
             </div>
 
             <div class="card">
-              <div class="card-header" style="padding:12px 16px;">
-                <span class="card-title" style="font-size:11px;">Almacenamiento — Subsistema</span>
+              <div class="card-header" style="padding:10px 14px;">
+                <span class="card-title">Almacenamiento</span>
               </div>
-              <div class="card-body" style="padding:12px;display:flex;flex-direction:column;gap:8px;font-size:12px;">
+              <div class="card-body" style="padding:10px 14px;display:flex;flex-direction:column;gap:7px;font-size:11.5px;">
                 <div style="display:flex;justify-content:space-between;">
                   <span class="text-muted">Base de datos de resultados</span>
                   <span id="stat-stored-results" class="font-mono">0</span>
@@ -1108,10 +1847,10 @@
             </div>
 
             <div class="card">
-              <div class="card-header" style="padding:12px 16px;">
-                <span class="card-title" style="font-size:11px;">Sesion Actual</span>
+              <div class="card-header" style="padding:10px 14px;">
+                <span class="card-title">Sesión Actual</span>
               </div>
-              <div class="card-body" style="padding:12px;display:flex;flex-direction:column;gap:8px;font-size:12px;">
+              <div class="card-body" style="padding:10px 14px;display:flex;flex-direction:column;gap:7px;font-size:11.5px;">
                 <div style="display:flex;justify-content:space-between;">
                   <span class="text-muted">Consultas</span>
                   <span id="stat-queries" class="font-mono">0</span>
@@ -1214,7 +1953,7 @@
                   <label class="form-label">Umbral de precision minima</label>
                   <div style="display:flex;align-items:center;gap:10px;">
                     <input class="form-input" type="number" id="training-threshold" value="90" min="50" max="100" style="max-width:100px;" />
-                    <span class="text-muted" style="font-size:12px;">% (RQNF-08: minimo 90%)</span>
+                    <span class="text-muted" style="font-size:12px;">% (minimo 90%)</span>
                   </div>
                 </div>
 
@@ -1287,6 +2026,151 @@
 
       </div>
       <!-- /panel-training -->
+
+      <!-- ═══════════════════════════════════════════════════
+           PANEL: Ciberseguridad — CU-3
+           RQF-06 (auth) · RQF-07 (cifrado) · RQNF-05 (seguridad)
+           RQNF-10 (auditoria) · RQNF-14 (whitelist de red)
+      ════════════════════════════════════════════════════ -->
+      <div class="view-panel" id="panel-security">
+
+        <!-- KPIs -->
+        <div class="db-kpi-row">
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--success-dim);color:var(--success);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Cifrado activo</div>
+              <div class="db-kpi-value" style="font-size:15px;">AES-256-GCM</div>
+            </div>
+            <div class="db-kpi-trend up">real</div>
+          </div>
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--primary-dim);color:var(--primary);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Usuarios registrados</div>
+              <div class="db-kpi-value" id="sec-kpi-users">—</div>
+            </div>
+            <div class="db-kpi-trend" id="sec-kpi-users-trend"></div>
+          </div>
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--info-dim);color:var(--info);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Sesion activa</div>
+              <div class="db-kpi-value" style="font-size:14px;" id="sec-kpi-session">—</div>
+            </div>
+            <div class="db-kpi-trend up">autenticado</div>
+          </div>
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--warning-dim);color:var(--warning);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Eventos en bitacora</div>
+              <div class="db-kpi-value" id="sec-kpi-logs">—</div>
+            </div>
+            <div class="db-kpi-trend" id="sec-kpi-logs-trend"></div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+
+          <!-- Autenticacion y acceso — REAL -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Autenticacion y Acceso</span>
+              <span class="badge badge-success" style="font-size:9px;">REAL &middot;</span>
+            </div>
+            <div class="card-body" style="padding:0;max-height:280px;overflow-y:auto;">
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Usuario</th><th>Rol</th><th>Permisos</th><th>Estado</th></tr></thead>
+                  <tbody id="sec-users-table"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cifrado de datos en reposo — REAL -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Cifrado de Datos en Reposo</span>
+              <span class="badge badge-success" style="font-size:9px;">REAL &middot; </span>
+            </div>
+            <div class="card-body" style="padding:12px;display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;gap:8px;align-items:center;">
+                <select class="form-select-styled" id="sec-crypto-select" style="flex:1;">
+                  <option value="history">Historial de consultas</option>
+                  <option value="logs">Bitacora de auditoria</option>
+                  <option value="users">Usuarios</option>
+                  <option value="results">Resultados del modelo</option>
+                </select>
+                <button class="btn btn-secondary btn-sm" onclick="Security.decryptPreview()">Descifrar</button>
+              </div>
+              <div>
+                <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;">Tal cual vive en localStorage (cifrado)</div>
+                <pre id="sec-crypto-raw" style="font-size:10px;font-family:var(--font-mono);background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-md);padding:10px;max-height:80px;overflow:auto;white-space:pre-wrap;word-break:break-all;color:var(--text-muted);">Selecciona un dataset...</pre>
+              </div>
+              <div>
+                <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;">Contenido real descifrado (solo en memoria, no se persiste asi)</div>
+                <pre id="sec-crypto-plain" style="font-size:10px;font-family:var(--font-mono);background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-md);padding:10px;max-height:110px;overflow:auto;white-space:pre-wrap;word-break:break-all;">—</pre>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Bitacora de auditoria — REAL -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Bitacora de Auditoria</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span class="badge badge-success" style="font-size:9px;">REAL &middot; RQNF-10</span>
+              <div class="sec-log-filters" id="sec-log-filters">
+                <button class="btn btn-ghost btn-sm sec-filter-btn active" data-level="ALL" onclick="Security.filterLogs('ALL', this)">Todos</button>
+                <button class="btn btn-ghost btn-sm sec-filter-btn" data-level="INFO" onclick="Security.filterLogs('INFO', this)">Info</button>
+                <button class="btn btn-ghost btn-sm sec-filter-btn" data-level="WARN" onclick="Security.filterLogs('WARN', this)">Alertas</button>
+                <button class="btn btn-ghost btn-sm sec-filter-btn" data-level="ERROR" onclick="Security.filterLogs('ERROR', this)">Errores</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;max-height:220px;overflow-y:auto;" id="sec-audit-log"></div>
+        </div>
+
+        <div class="grid-2">
+
+          <!-- Whitelist de red — REAL -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Validacion de Red — Whitelist de Dominios</span>
+              <span class="badge badge-success" style="font-size:9px;">REAL &middot; </span>
+            </div>
+            <div class="card-body" style="padding:12px;display:flex;flex-direction:column;gap:10px;">
+              <div style="font-size:12px;color:var(--text-secondary);">Todo destino de red pasa por <code>CONFIG.isAllowedDomain()</code> antes de ejecutarse. Dominios autorizados:</div>
+              <div id="sec-domain-list" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+              <button class="btn btn-secondary btn-sm" onclick="Security.testBlockedDomain()">Simular intento a dominio no autorizado</button>
+              <div id="sec-domain-result" style="font-size:11px;"></div>
+            </div>
+          </div>
+
+          <!-- Relaciones con otros subsistemas — SIMULADO -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Relaciones con Otros Subsistemas</span>
+              <span class="badge badge-muted" style="font-size:9px;">SIMULADO &middot; fase siguiente</span>
+            </div>
+            <div class="card-body" style="padding:12px;display:flex;flex-direction:column;gap:10px;" id="sec-relations-list"></div>
+          </div>
+
+        </div>
+
+      </div>
+      <!-- /panel-security -->
 
     </div>
     <!-- /content-body -->
@@ -1387,20 +2271,29 @@ function handleLogout () {
 const UI = (() => {
   const views = {
     'dashboard': { title: 'Dashboard',          sub: 'Vision general del sistema' },
-    'model':     { title: 'Modelo IA / MML',    sub: 'Portal de consultas multimodal — CU-1' },
-    'servers':   { title: 'Servidores',          sub: 'Monitor de salud y recursos en tiempo real — CU-2' },
-    'training':  { title: 'Entrenamiento IA',   sub: 'Motor de aprendizaje del modelo — CU-4' },
+    'fuente':    { title: 'Fuente de Datos',    sub: 'Recepcion de datos internos y externos — punto de partida del flujo de informacion' },
+    'procesamiento': { title: 'Procesamiento', sub: 'Validacion, normalizacion y transformacion de datos' },
+    'conexion':  { title: 'Conexion de Datos', sub: 'Canales de comunicacion y validacion de integridad' },
+    'almacen':   { title: 'Almacenamiento',    sub: 'Base de datos de resultados y cache de modelos' },
+    'postproc':  { title: 'Postprocesamiento', sub: 'Formateo de resultados y generacion de reportes' },
+    'interfaz':  { title: 'Interfaz / UI',      sub: 'Dashboard interactivo, portal de entrada y ciclo de retroalimentacion — datos reales de la sesion' },
+    'model':     { title: 'Modelo IA / MML',    sub: 'Portal de consultas multimodal' },
+    'servers':   { title: 'Servidores',          sub: 'Monitor de salud y recursos en tiempo real' },
+    'training':  { title: 'Entrenamiento IA',   sub: 'Motor de aprendizaje del modelo' },
+    'security':  { title: 'Ciberseguridad',     sub: 'Autenticacion, cifrado y auditoria' },
   };
 
   function navigate (el) {
     const view = el.dataset.view;
     const perm = el.dataset.perm;
 
-    // Verificar permiso
-    if (perm && !Auth.can(perm)) {
+    // Verificar permiso — solo bloquear si el usuario ya está cargado
+    // y realmente no tiene el permiso (evita falsos negativos por timing async)
+    if (perm && Auth.currentUser() && !Auth.can(perm)) {
       Auth.addLog('WARN', `Acceso denegado a la vista: ${view}`);
       return;
     }
+
 
     document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
     el.classList.add('active');
@@ -1582,7 +2475,7 @@ const Dashboard = (() => {
     setInterval(_renderUptime, 1000);
   }
 
-  return { init, registerQuery, refreshLogs };
+  return { init, registerQuery, refreshLogs, getStats: () => ({ queryCount: _queryCount, imageCount: _imageCount, sessionStart: _sessionStart }) };
 })();
 
 /* ══════════════════════════════════════════════════════════
@@ -2008,27 +2901,85 @@ const Chat = (() => {
     }
   });
 
-  /* ── Llamada al modelo — envía TEXTO + IMÁGENES + DOCUMENTOS ──
-     Núcleo del Modelo IA / MML: cualquier adjunto (imagen o
-     documento) viaja como inlineData al motor de inferencia. */
+  function _splitAttachments (attachmentsToSend) {
+    const images  = [];
+    const docs    = [];
+    const omitted = [];
+    attachmentsToSend.forEach(att => {
+      if (att.mime && att.mime.startsWith('video/')) {
+        omitted.push(att); // video local/base64 no soportado por la API
+      } else if (att.mime && att.mime.startsWith('image/')) {
+        images.push(att);
+      } else {
+        docs.push(att); // pdf, txt, csv
+      }
+    });
+    return { images, docs, omitted };
+  }
+
+  function _decodeBase64Text (base64) {
+    try {
+      return decodeURIComponent(escape(atob(base64)));
+    } catch (e) {
+      return atob(base64); // fallback si el contenido no es UTF-8 valido
+    }
+  }
+
   async function _callGemini (userText, attachmentsToSend) {
     const apiKey = CONFIG.model.apiKey;
-    const parts  = [];
 
-    attachmentsToSend.forEach(att => {
-      parts.push({ inlineData: { mimeType: att.mime, data: att.base64 } });
+    const { images, docs, omitted } = _splitAttachments(attachmentsToSend);
+
+    const content = [];
+
+    images.forEach(att => {
+      content.push({
+        type: 'image_url',
+        image_url: { url: `data:${att.mime};base64,${att.base64}` },
+      });
     });
-    if (userText) parts.push({ text: userText });
 
-    _history.push({ role: 'user', parts });
+    docs.forEach(att => {
+      if (att.mime === 'application/pdf') {
+        // Formato "file" estandar de facto — ver nota de limitaciones arriba.
+        content.push({
+          type: 'file',
+          file: {
+            filename: att.name || 'documento.pdf',
+            file_data: `data:${att.mime};base64,${att.base64}`,
+          },
+        });
+      } else {
+        // .txt / .csv: se manda el contenido como texto plano.
+        const texto = _decodeBase64Text(att.base64);
+        content.push({
+          type: 'text',
+          text: `[Contenido de ${att.name || 'archivo adjunto'}]:\n${texto}`,
+        });
+      }
+    });
+
+    let finalText = userText || '';
+    if (omitted.length) {
+      const nota = `[Aviso: ${omitted.length} archivos de video no se enviaron — la API actual solo acepta video por URL pública, no archivos locales.]`;
+      finalText = finalText ? `${finalText}\n\n${nota}` : nota;
+    }
+    if (finalText) content.push({ type: 'text', text: finalText });
+
+    _history.push({ role: 'user', content });
 
     const body = {
-      system_instruction: { parts: [{ text: CONFIG.model.systemPrompt }] },
-      contents: _history,
-      generationConfig: { maxOutputTokens: CONFIG.model.maxOutputTokens },
+      model: CONFIG.model.id,
+      messages: [
+        { role: 'system', content: CONFIG.model.systemPrompt },
+        ..._history,
+      ],
+      max_tokens: CONFIG.model.maxOutputTokens,
+      temperature: CONFIG.model.temperature,
+      stream: false,
     };
 
-    const targetUrl = `${CONFIG.model.endpoint}?key=${apiKey}`;
+    const targetUrl = CONFIG.model.endpoint;
 
     // Restriccion de red (RQNF-14): solo dominios en whitelist
     if (!CONFIG.isAllowedDomain(targetUrl)) {
@@ -2038,7 +2989,10 @@ const Chat = (() => {
 
     const res = await fetch(targetUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
       body: JSON.stringify(body),
     });
 
@@ -2048,10 +3002,9 @@ const Chat = (() => {
     }
 
     const data = await res.json();
-    const responseText = data?.candidates?.[0]?.content?.parts
-      ?.filter(p => p.text)?.map(p => p.text)?.join('') || '(Sin respuesta del modelo)';
+    const responseText = data?.choices?.[0]?.message?.content || '(Sin respuesta del modelo)';
 
-    _history.push({ role: 'model', parts: [{ text: responseText }] });
+    _history.push({ role: 'assistant', content: responseText });
     return responseText;
   }
 
@@ -2514,7 +3467,780 @@ const Training = (() => {
     }).join('');
   }
 
-  return { start, reset };
+  return { start, reset, getCache: () => _cache };
+})();
+
+/* ══════════════════════════════════════════════════════════
+   SECURITY — CU-3: autenticacion, cifrado, auditoria, red
+   Autenticacion, cifrado (Crypto/AES-256-GCM) y whitelist de
+   red (CONFIG.isAllowedDomain) son REALES — reutilizan el mismo
+   Auth/Crypto/CONFIG que ya opera el resto del sistema.
+   La seccion "Relaciones con otros subsistemas" es SIMULADA:
+   describe, segun el documento, como se conectara Ciberseguridad
+   con Conexion de datos / Servidores distribuidos / Interfaz-UI
+   cuando esas fases se construyan.
+════════════════════════════════════════════════════════ */
+const Security = (() => {
+
+  const _dsKeyMap = {
+    history: CONFIG.keys.history,
+    logs:    CONFIG.keys.logs,
+    users:   CONFIG.keys.users,
+    results: CONFIG.keys.results,
+  };
+
+  let _logFilter = 'ALL';
+
+  /* ── Tabla de usuarios reales (CONFIG.getUsers) ─────────── */
+  async function _renderUsers () {
+    const tbody = document.getElementById('sec-users-table');
+    if (!tbody) return;
+    const users   = await CONFIG.getUsers();
+    const current = Auth.currentUser();
+
+    document.getElementById('sec-kpi-users').textContent = users.length;
+
+    tbody.innerHTML = users.map(u => {
+      const isMe   = current && u.id === current.id;
+      const perms  = u.perms.map(p => `<span class="sec-perm-chip">${p}</span>`).join('');
+      const estado = isMe
+        ? '<span class="badge badge-success" style="font-size:9px;">conectado ahora</span>'
+        : '<span class="badge badge-muted" style="font-size:9px;">registrado</span>';
+      return `
+        <tr>
+          <td>${u.username}</td>
+          <td>${u.role}</td>
+          <td style="max-width:220px;">${perms}</td>
+          <td>${estado}</td>
+        </tr>
+      `;
+    }).join('');
+
+    if (current) {
+      document.getElementById('sec-kpi-session').textContent = `${current.username} · ${current.role}`;
+    }
+  }
+
+  /* ── Demo de cifrado real — muestra el valor cifrado tal cual
+     esta en localStorage y, bajo demanda, lo descifra con el
+     mismo modulo Crypto que usa el resto del sistema ────────── */
+  function _updateRawPreview () {
+    const select = document.getElementById('sec-crypto-select');
+    const raw    = localStorage.getItem(_dsKeyMap[select.value]);
+    document.getElementById('sec-crypto-raw').textContent =
+      raw ? raw : '(sin datos guardados todavia para este dataset)';
+    document.getElementById('sec-crypto-plain').textContent = '—';
+  }
+
+  async function decryptPreview () {
+    const select = document.getElementById('sec-crypto-select');
+    const raw    = localStorage.getItem(_dsKeyMap[select.value]);
+    const plainEl = document.getElementById('sec-crypto-plain');
+    if (!raw) { plainEl.textContent = '(sin datos guardados todavia para este dataset)'; return; }
+    const data = await Crypto.decrypt(raw);
+    plainEl.textContent = data ? JSON.stringify(data, null, 2) : '(no se pudo descifrar)';
+  }
+
+  /* ── Bitacora de auditoria real (Auth.getLogs) ──────────── */
+  async function _renderAuditLog () {
+    const container = document.getElementById('sec-audit-log');
+    if (!container) return;
+    const all  = await Auth.getLogs();
+    document.getElementById('sec-kpi-logs').textContent = all.length;
+
+    const logs = (_logFilter === 'ALL' ? all : all.filter(l => l.level === _logFilter)).slice(0, 60);
+    if (!logs.length) {
+      container.innerHTML = '<div style="padding:14px;color:var(--text-muted);font-size:12px;">Sin eventos para este filtro.</div>';
+      return;
+    }
+    const colorMap = { INFO: 'var(--info)', WARN: 'var(--warning)', ERROR: 'var(--danger)' };
+    container.innerHTML = logs.map(l => {
+      const t = new Date(l.ts).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+      return `
+        <div class="db-activity-item">
+          <span class="db-activity-time">${t}</span>
+          <span class="db-activity-dot" style="background:${colorMap[l.level] || 'var(--border)'}"></span>
+          <span class="db-activity-msg">[${l.level}] ${l.msg} <span style="color:var(--text-muted);">(${l.user})</span></span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function filterLogs (level, btn) {
+    _logFilter = level;
+    document.querySelectorAll('.sec-filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    _renderAuditLog();
+  }
+
+  /* ── Whitelist de dominios real (CONFIG.isAllowedDomain) ─── */
+  function _renderDomains () {
+    const container = document.getElementById('sec-domain-list');
+    if (!container) return;
+    container.innerHTML = CONFIG.network.allowedDomains.map(d => `
+      <div class="sec-domain-chip">
+        <span class="status-dot online"></span>${d}
+      </div>
+    `).join('');
+  }
+
+  function testBlockedDomain () {
+    const fake = 'https://exfil-no-autorizado.example.com/api';
+    const allowed = CONFIG.isAllowedDomain(fake);
+    const resultEl = document.getElementById('sec-domain-result');
+    Auth.addLog('ERROR', `Conexion bloqueada: dominio fuera de whitelist (${fake})`);
+    resultEl.innerHTML = allowed
+      ? '<span style="color:var(--success);">Permitido (inesperado)</span>'
+      : `<span style="color:var(--danger);">Bloqueado por CONFIG.isAllowedDomain() — ver bitacora abajo</span>`;
+    _renderAuditLog();
+  }
+
+  /* ── Relaciones con otros subsistemas — SIMULADO ─────────── */
+  function _renderRelations () {
+    const container = document.getElementById('sec-relations-list');
+    if (!container) return;
+    const relations = [
+      {
+        title: 'Ciberseguridad ↔ Conexion de Datos',
+        desc:  'Valida integridad y encripta cada paquete que viaja por los canales de comunicacion antes de llegar a otros subsistemas.',
+      },
+      {
+        title: 'Ciberseguridad ↔ Servidores Distribuidos',
+        desc:  'Supervisa que las operaciones ejecutadas en los servidores cumplan los protocolos de seguridad y acceso.',
+      },
+      {
+        title: 'Ciberseguridad → Interfaz / UI',
+        desc:  'Protege los datos del usuario al establecer la sesion en la interfaz conectada.',
+      },
+    ];
+    container.innerHTML = relations.map(r => `
+      <div class="sec-relation-row">
+        <div class="sec-relation-title">${r.title}</div>
+        <div class="sec-relation-desc">${r.desc}</div>
+      </div>
+    `).join('');
+  }
+
+  async function init () {
+    await Auth.init();
+    _renderUsers();
+    _renderAuditLog();
+    _renderDomains();
+    _renderRelations();
+    document.getElementById('sec-crypto-select').addEventListener('change', _updateRawPreview);
+    setInterval(() => {
+      if (document.getElementById('panel-security').classList.contains('active')) {
+        _renderUsers();
+        _renderAuditLog();
+      }
+    }, 5000);
+  }
+
+  return { init, decryptPreview, filterLogs, testBlockedDomain };
+})();
+
+/* ══════════════════════════════════════════════════════════
+   FUENTE DE DATOS (subsistema simulado)
+   Componentes del documento: Base de datos principal,
+   Fuentes externas. No hay integracion real — genera datos
+   de ejemplo para verificar visualmente el flujo descrito.
+════════════════════════════════════════════════════════ */
+const FuenteDatos = (() => {
+
+  const _tiposDato   = ['Texto', 'Imagen', 'JSON', 'CSV', 'Audio'];
+  const _origenesInt = ['Portal de entrada de datos', 'Consulta manual', 'Carga interna'];
+
+  let _sources = [
+    { id: 'SRC-01', name: 'API de Inventario',      online: true,  latency: 42  },
+    { id: 'SRC-02', name: 'Feed de Noticias',        online: true,  latency: 118 },
+    { id: 'SRC-03', name: 'Sensor IoT — Planta A',   online: true,  latency: 27  },
+    { id: 'SRC-04', name: 'Sistema CRM Externo',     online: false, latency: 0   },
+  ];
+
+  let _records = [];
+  let _seq = 0;
+
+  function _fmtTime (d) {
+    return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+
+  function _fmtSize () {
+    return (Math.random() * 4 + 0.2).toFixed(1) + ' MB';
+  }
+
+  function _renderSources () {
+    const container = document.getElementById('fd-sources-list');
+    if (!container) return;
+    container.innerHTML = _sources.map(s => `
+      <div class="fd-source-item">
+        <div>
+          <div class="fd-source-info">
+            <span class="status-dot ${s.online ? 'online' : 'offline'}"></span>
+            ${s.name}
+          </div>
+          <div class="fd-source-meta">${s.id} · ${s.online ? s.latency + ' ms' : 'sin conexion'}</div>
+        </div>
+        <div class="fd-toggle ${s.online ? 'on' : ''}" onclick="FuenteDatos.toggleSource('${s.id}')"></div>
+      </div>
+    `).join('');
+
+    const online = _sources.filter(s => s.online).length;
+    document.getElementById('fd-kpi-sources').textContent = `${online} / ${_sources.length}`;
+  }
+
+  function toggleSource (id) {
+    const s = _sources.find(x => x.id === id);
+    if (!s) return;
+    s.online = !s.online;
+    s.latency = s.online ? Math.floor(Math.random() * 150 + 20) : 0;
+    _renderSources();
+    Auth.addLog('INFO', `Fuente de Datos: fuente externa "${s.name}" ${s.online ? 'conectada' : 'desconectada'}`);
+  }
+
+  function _renderRecords (highlightId) {
+    const body = document.getElementById('fd-records-body');
+    if (!body) return;
+    body.innerHTML = _records.slice(0, 25).map(r => `
+      <tr class="${r.id === highlightId ? 'fd-row-new' : ''}">
+        <td class="font-mono">${r.id}</td>
+        <td>${r.origen}</td>
+        <td>${r.tipo}</td>
+        <td class="font-mono">${r.tamano}</td>
+        <td class="font-mono">${r.hora}</td>
+        <td><span class="badge badge-success" style="font-size:10px;">recibido</span></td>
+      </tr>
+    `).join('') || `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px;">Sin registros todavia — usa "Simular nueva entrada de datos"</td></tr>`;
+
+    document.getElementById('fd-kpi-records').textContent = _records.length;
+    if (_records.length) {
+      document.getElementById('fd-kpi-last').textContent = _records[0].hora;
+    }
+  }
+
+  async function _flashFlow () {
+    const nodes = ['fd-flow-fuente', 'fd-flow-proc', 'fd-flow-conn'];
+    for (const id of nodes) {
+      document.getElementById(id).classList.add('active');
+      await new Promise(r => setTimeout(r, 350));
+    }
+    await new Promise(r => setTimeout(r, 500));
+    nodes.forEach((id, i) => { if (i > 0) document.getElementById(id).classList.remove('active'); });
+  }
+
+  async function simulate () {
+    const btn = document.getElementById('fd-btn-simulate');
+    btn.disabled = true;
+
+    _seq++;
+    const activeSources = _sources.filter(s => s.online);
+    const usarExterna = activeSources.length > 0 && Math.random() > 0.4;
+    const origen = usarExterna
+      ? activeSources[Math.floor(Math.random() * activeSources.length)].name
+      : _origenesInt[Math.floor(Math.random() * _origenesInt.length)];
+
+    const record = {
+      id:     `REG-${String(_seq).padStart(4, '0')}`,
+      origen,
+      tipo:   _tiposDato[Math.floor(Math.random() * _tiposDato.length)],
+      tamano: _fmtSize(),
+      hora:   _fmtTime(new Date()),
+    };
+
+    _records.unshift(record);
+    _renderRecords(record.id);
+    Auth.addLog('INFO', `Fuente de Datos: nuevo registro ${record.id} recibido desde "${origen}" (${record.tipo})`);
+
+    await _flashFlow();
+    btn.disabled = false;
+  }
+
+  function init () {
+    _renderSources();
+    _renderRecords();
+    document.getElementById('fd-btn-simulate').addEventListener('click', simulate);
+  }
+
+  return { init, toggleSource, simulate };
+})();
+
+/* ══════════════════════════════════════════════════════════
+   PROCESAMIENTO (subsistema simulado)
+   Componentes del documento: Validador de datos, Normalizador,
+   Transformador. Simula el paso a paso descrito en RQF-02/03.
+════════════════════════════════════════════════════════ */
+const Procesamiento = (() => {
+
+  const _tiposDato = ['Texto', 'Imagen', 'JSON', 'CSV', 'Audio'];
+  const _stages = ['validador', 'normalizador', 'transformador'];
+  const _stageMsgs = {
+    validador:     ['Verificando integridad del registro...', 'Formato correcto', 'Completitud OK'],
+    normalizador:  ['Ajustando codificacion a UTF-8...', 'Unificando formato de fechas', 'Estructura normalizada'],
+    transformador: ['Limpiando valores nulos...', 'Enriqueciendo metadatos', 'Reestructuracion completa'],
+  };
+
+  let _processed = 0;
+  let _rejected  = 0;
+  let _times     = [];
+  let _seq       = 0;
+
+  function _log (msg, cls) {
+    const box = document.getElementById('pr-log-box');
+    const line = document.createElement('div');
+    line.className = 'pr-log-line' + (cls ? ' ' + cls : '');
+    line.textContent = msg;
+    if (box.firstChild && box.firstChild.tagName === 'SPAN') box.innerHTML = '';
+    box.prepend(line);
+    while (box.children.length > 12) box.removeChild(box.lastChild);
+  }
+
+  function _setStage (name, state) {
+    const el = document.getElementById('pr-stage-' + name);
+    el.classList.remove('active', 'done', 'error');
+    if (state) el.classList.add(state);
+  }
+
+  function _resetStages () {
+    _stages.forEach(s => _setStage(s, null));
+  }
+
+  function _delay (ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  function _renderProcessed (highlightId) {
+    const body = document.getElementById('pr-processed-body');
+    const rows = _processedList.slice(0, 25).map(r => `
+      <tr class="${r.id === highlightId ? 'fd-row-new' : ''}">
+        <td class="font-mono">${r.id}</td>
+        <td><span class="badge badge-success" style="font-size:10px;">3 / 3</span></td>
+        <td>${r.tipo}</td>
+        <td class="font-mono">${r.duracion} ms</td>
+        <td class="font-mono">${r.hora}</td>
+      </tr>
+    `).join('');
+    body.innerHTML = rows || `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px;">Aun no hay registros procesados</td></tr>`;
+    document.getElementById('pr-processed-count').textContent = `${_processedList.length} registros`;
+  }
+
+  let _processedList = [];
+
+  async function processNext () {
+    const btn = document.getElementById('pr-btn-process');
+    btn.disabled = true;
+    _resetStages();
+
+    _seq++;
+    const regId = `REG-${String(_seq).padStart(4, '0')}`;
+    const tipo  = _tiposDato[Math.floor(Math.random() * _tiposDato.length)];
+    const t0    = performance.now();
+
+    // Flujo alternativo: ~12% de probabilidad de rechazo en validacion
+    const fallaValidacion = Math.random() < 0.12;
+
+    _log(`— Iniciando procesamiento de ${regId} (${tipo})`);
+
+    _setStage('validador', 'active');
+    await _delay(400);
+    if (fallaValidacion) {
+      _setStage('validador', 'error');
+      _log(`✕ ${regId}: datos corruptos o incompletos — registro rechazado`, 'pr-log-error');
+      _rejected++;
+      document.getElementById('pr-kpi-rejected').textContent = _rejected;
+      Auth.addLog('WARN', `Procesamiento: registro ${regId} rechazado por el Validador de Datos`);
+      btn.disabled = false;
+      return;
+    }
+    _log(`✓ Validador: ${_stageMsgs.validador[1]}`);
+    _setStage('validador', 'done');
+
+    _setStage('normalizador', 'active');
+    await _delay(400);
+    _log(`✓ Normalizador: ${_stageMsgs.normalizador[2]}`);
+    _setStage('normalizador', 'done');
+
+    _setStage('transformador', 'active');
+    await _delay(400);
+    _log(`✓ Transformador: ${_stageMsgs.transformador[2]}`);
+    _setStage('transformador', 'done');
+
+    const duracion = Math.round(performance.now() - t0);
+    _times.push(duracion);
+    _processed++;
+
+    _processedList.unshift({
+      id: regId, tipo, duracion,
+      hora: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+    });
+
+    document.getElementById('pr-kpi-processed').textContent = _processed;
+    const avg = Math.round(_times.reduce((a, b) => a + b, 0) / _times.length);
+    document.getElementById('pr-kpi-avgtime').textContent = `${avg} ms`;
+    _renderProcessed(regId);
+
+    _log(`→ ${regId} listo — enviado a Conexion de Datos`);
+    Auth.addLog('INFO', `Procesamiento: registro ${regId} validado, normalizado y transformado (${duracion} ms)`);
+
+    btn.disabled = false;
+  }
+
+  function init () {
+    _renderProcessed();
+    document.getElementById('pr-btn-process').addEventListener('click', processNext);
+  }
+
+  return { init, processNext };
+})();
+
+/* ══════════════════════════════════════════════════════════
+   CONEXION DE DATOS (subsistema simulado)
+   Componentes del documento: Canales de comunicacion,
+   Validador de integridad. RQF-05.
+════════════════════════════════════════════════════════ */
+const ConexionDatos = (() => {
+
+  const _route = ['proc', 'conn', 'sec', 'srv'];
+  let _packets  = 0;
+  let _corrupt  = 0;
+  let _throughputs = [];
+
+  function _addLogEntry (text, ok) {
+    const list = document.getElementById('cx-log-list');
+    const row = document.createElement('div');
+    row.className = 'cx-log-row';
+    row.innerHTML = `
+      <span class="badge ${ok ? 'badge-success' : 'badge-danger'}" style="font-size:10px;">${ok ? 'integro' : 'corrupto'}</span>
+      <span>${text}</span>
+    `;
+    list.prepend(row);
+    while (list.children.length > 30) list.removeChild(list.lastChild);
+  }
+
+  function _delay (ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  async function sendPacket () {
+    const btn = document.getElementById('cx-btn-send');
+    btn.disabled = true;
+
+    _packets++;
+    const pktId = `PKT-${String(_packets).padStart(4, '0')}`;
+    const size  = Math.floor(Math.random() * 800 + 100); // KB
+    const t0    = performance.now();
+
+    // animar nodo por nodo
+    for (let i = 0; i < _route.length; i++) {
+      document.getElementById('cx-node-' + _route[i]).classList.add('cx-active');
+      await _delay(280);
+      document.getElementById('cx-node-' + _route[i]).classList.remove('cx-active');
+      document.getElementById('cx-node-' + _route[i]).classList.add('cx-passed');
+    }
+
+    // validacion de integridad — ~8% de probabilidad de corrupcion simulada
+    const corrupto = Math.random() < 0.08;
+    const elapsedS = (performance.now() - t0) / 1000;
+    const mbps = ((size / 1024) / elapsedS).toFixed(2);
+    _throughputs.push(parseFloat(mbps));
+
+    if (corrupto) {
+      _corrupt++;
+      document.getElementById('cx-kpi-corrupt').textContent = _corrupt;
+      _addLogEntry(`${pktId} (${size} KB) — checksum invalido, paquete descartado`, false);
+      Auth.addLog('WARN', `Conexion de Datos: paquete ${pktId} descartado por el Validador de Integridad`);
+    } else {
+      _addLogEntry(`${pktId} (${size} KB) — verificado, entregado a Servidores Distribuidos`, true);
+      Auth.addLog('INFO', `Conexion de Datos: paquete ${pktId} transmitido y verificado (${mbps} Mb/s)`);
+    }
+
+    document.getElementById('cx-kpi-packets').textContent = _packets;
+    const avgThroughput = (_throughputs.reduce((a, b) => a + b, 0) / _throughputs.length).toFixed(2);
+    document.getElementById('cx-kpi-throughput').textContent = `${avgThroughput} Mb/s`;
+
+    await _delay(200);
+    _route.forEach(r => document.getElementById('cx-node-' + r).classList.remove('cx-passed'));
+    btn.disabled = false;
+  }
+
+  function init () {
+    document.getElementById('cx-btn-send').addEventListener('click', sendPacket);
+  }
+
+  return { init, sendPacket };
+})();
+
+/* ══════════════════════════════════════════════════════════
+   ALMACENAMIENTO (subsistema REAL — no simulado)
+   Componentes del documento: Base de datos de resultados
+   (= historial cifrado real de consultas/respuestas del
+   modelo), Cache de modelos (= versiones reales entrenadas
+   en el panel de Entrenamiento IA).
+════════════════════════════════════════════════════════ */
+const Almacenamiento = (() => {
+
+  function _truncate (s, n) {
+    if (!s) return '(vacio)';
+    return s.length > n ? s.slice(0, n) + '…' : s;
+  }
+
+  async function _renderResults () {
+    const list = document.getElementById('al-results-list');
+    const raw  = localStorage.getItem(CONFIG.keys.history);
+    const stored = (await Crypto.decrypt(raw)) || [];
+
+    document.getElementById('al-kpi-results').textContent = stored.length;
+    const approxKB = raw ? (raw.length / 1024).toFixed(1) : '0';
+    document.getElementById('al-kpi-size').textContent = `${approxKB} KB`;
+
+    if (!stored.length) {
+      list.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:12px;">
+        Aun no hay resultados guardados. Envia una consulta real en "Modelo IA / MML" para verlo aqui.
+      </div>`;
+      return;
+    }
+
+    list.innerHTML = stored.slice(0, 30).map(r => {
+      const ts = new Date(r.ts).toLocaleString('es', { hour12: false });
+      const respText = typeof r.response === 'string' ? r.response.replace(/<[^>]*>/g, '') : '';
+      return `
+        <div class="al-result-item">
+          <div class="al-result-top">
+            <span class="font-mono" style="font-size:10px;color:var(--text-muted);">${ts}</span>
+            <span class="badge badge-success" style="font-size:9px;">${r.user}</span>
+          </div>
+          <div class="al-result-query">${_truncate(r.query, 90)}</div>
+          <div class="al-result-response">${_truncate(respText, 110)}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function _renderCache () {
+    const list = document.getElementById('al-cache-list');
+    const cache = Training.getCache();
+    document.getElementById('al-kpi-versions').textContent = cache.length;
+
+    if (!cache.length) {
+      list.innerHTML = `<div style="font-size:12px;color:var(--text-muted);">
+        Sin versiones aun. Entrena el modelo en "Entrenamiento IA" para generar una.
+      </div>`;
+      return;
+    }
+
+    list.innerHTML = [...cache].reverse().map(v => `
+      <div class="al-cache-item">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span class="font-mono" style="font-size:12px;font-weight:600;color:var(--text-primary);">${v.id}</span>
+          ${v.active ? '<span class="badge badge-success" style="font-size:9px;">activa</span>' : ''}
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">
+          dataset: ${v.dataset} · accuracy: ${v.accuracy}% · ${v.epochs} epocas
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function refresh () {
+    await _renderResults();
+    _renderCache();
+  }
+
+  function init () {
+    refresh();
+    document.getElementById('al-btn-refresh').addEventListener('click', refresh);
+    // refrescar automaticamente si el panel esta activo cuando cambian los datos
+    setInterval(() => {
+      if (document.getElementById('panel-almacen').classList.contains('active')) refresh();
+    }, 4000);
+  }
+
+  return { init, refresh };
+})();
+
+/* ══════════════════════════════════════════════════════════
+   POSTPROCESAMIENTO (subsistema REAL — no simulado)
+   Componentes del documento: Formateador de resultados,
+   Generador de reportes. Trabaja sobre el historial real
+   guardado por Almacenamiento (RQF-15 / RQF-16).
+════════════════════════════════════════════════════════ */
+const Postprocesamiento = (() => {
+
+  let _reportsGenerated = 0;
+
+  function _stripHtml (s) {
+    return typeof s === 'string' ? s.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() : '';
+  }
+
+  async function _getHistory () {
+    const raw = localStorage.getItem(CONFIG.keys.history);
+    return (await Crypto.decrypt(raw)) || [];
+  }
+
+  async function _renderFormatted () {
+    const list = document.getElementById('pp-formatted-list');
+    const stored = await _getHistory();
+    document.getElementById('pp-kpi-available').textContent = stored.length;
+
+    if (!stored.length) {
+      list.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:12px;">
+        Aun no hay resultados reales del modelo. Envia una consulta en "Modelo IA / MML" para formatearla aqui.
+      </div>`;
+      return;
+    }
+
+    list.innerHTML = stored.slice(0, 20).map((r, i) => {
+      const ts = new Date(r.ts).toLocaleString('es', { hour12: false });
+      const clean = _stripHtml(r.response);
+      const wordCount = clean.split(' ').filter(Boolean).length;
+      return `
+        <div class="pp-format-item">
+          <div class="pp-format-head">
+            <span class="badge badge-success" style="font-size:9px;">#${stored.length - i}</span>
+            <span class="font-mono" style="font-size:10px;color:var(--text-muted);">${ts}</span>
+            <span class="font-mono" style="font-size:10px;color:var(--text-muted);">${wordCount} palabras</span>
+          </div>
+          <div class="pp-format-field"><strong>Consulta:</strong> ${r.query || '(vacio)'}</div>
+          <div class="pp-format-field"><strong>Resultado formateado:</strong> ${clean.slice(0, 220)}${clean.length > 220 ? '…' : ''}</div>
+        </div>
+      `;
+    }).join('');
+
+    if (stored.length) {
+      document.getElementById('pp-kpi-last').textContent =
+        new Date(stored[0].ts).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+  }
+
+  function _buildReportHTML (entries) {
+    const rows = entries.map((r, i) => `
+      <tr>
+        <td>${entries.length - i}</td>
+        <td>${new Date(r.ts).toLocaleString('es', { hour12: false })}</td>
+        <td>${r.user}</td>
+        <td>${(r.query || '(vacio)').replace(/</g, '&lt;')}</td>
+        <td>${_stripHtml(r.response).replace(/</g, '&lt;').slice(0, 400)}</td>
+      </tr>
+    `).join('');
+
+    return `<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8">
+<title>Reporte — Sistema de IA</title>
+<style>
+  body { font-family: Arial, sans-serif; background:#0a0a0a; color:#eddada; padding:24px; }
+  h1 { color:#10b981; }
+  table { width:100%; border-collapse:collapse; margin-top:16px; }
+  th, td { border:1px solid #292929; padding:8px; font-size:12px; text-align:left; vertical-align:top; }
+  th { background:#1f1f1f; }
+  .meta { color:#a1a1aa; font-size:12px; }
+</style>
+</head><body>
+  <h1>Reporte de Resultados — Sistema de IA</h1>
+  <div class="meta">Generado: ${new Date().toLocaleString('es', { hour12: false })} · Generador de Reportes (Postprocesamiento) · ${entries.length} resultado(s)</div>
+  <table>
+    <thead><tr><th>#</th><th>Fecha</th><th>Usuario</th><th>Consulta</th><th>Resultado</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+</body></html>`;
+  }
+
+  async function generateReport () {
+    const btn    = document.getElementById('pp-btn-generate');
+    const status = document.getElementById('pp-report-status');
+    const count  = parseInt(document.getElementById('pp-report-count').value, 10);
+
+    btn.disabled = true;
+    status.textContent = 'Formateando resultados...';
+
+    const stored  = await _getHistory();
+    const entries = count > 0 ? stored.slice(0, count) : stored;
+
+    if (!entries.length) {
+      status.textContent = 'No hay resultados para incluir en el reporte.';
+      btn.disabled = false;
+      return;
+    }
+
+    const html = _buildReportHTML(entries);
+    const blob = new Blob([html], { type: 'text/html' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `reporte-sistema-ia-${Date.now()}.html`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+
+    _reportsGenerated++;
+    document.getElementById('pp-kpi-reports').textContent = _reportsGenerated;
+    status.textContent = `Reporte generado con ${entries.length} resultado(s) — descarga iniciada.`;
+    Auth.addLog('INFO', `Postprocesamiento: reporte generado con ${entries.length} resultado(s)`);
+
+    btn.disabled = false;
+  }
+
+  async function refresh () {
+    await _renderFormatted();
+  }
+
+  function init () {
+    refresh();
+    document.getElementById('pp-btn-refresh').addEventListener('click', refresh);
+    document.getElementById('pp-btn-generate').addEventListener('click', generateReport);
+    setInterval(() => {
+      if (document.getElementById('panel-postproc').classList.contains('active')) refresh();
+    }, 4000);
+  }
+
+  return { init, refresh, generateReport };
+})();
+
+/* ══════════════════════════════════════════════════════════
+   INTERFAZ / UI (subsistema REAL — no simulado)
+   Componentes del documento: Dashboard interactivo, Portal
+   de entrada de datos. Cierra el ciclo de retroalimentacion
+   (linea punteada) hacia Procesamiento / Modelo IA.
+════════════════════════════════════════════════════════ */
+const InterfazUI = (() => {
+
+  async function _getFeedback () {
+    const raw = localStorage.getItem(CONFIG.keys.results);
+    return (await Crypto.decrypt(raw)) || [];
+  }
+
+  async function refresh () {
+    const stats = Dashboard.getStats();
+    document.getElementById('ui-kpi-queries').textContent = stats.queryCount;
+    document.getElementById('ui-kpi-images').textContent  = stats.imageCount;
+
+    const feedback = await _getFeedback();
+    const countEl = document.getElementById('ui-kpi-feedback-count');
+    const avgEl   = document.getElementById('ui-kpi-feedback');
+    countEl.textContent = feedback.length === 1 ? '1 envio' : `${feedback.length} envios`;
+
+    if (!feedback.length) {
+      avgEl.textContent = '— ★';
+    } else {
+      const avg = feedback.reduce((a, f) => a + (f.stars || 0), 0) / feedback.length;
+      avgEl.textContent = `${avg.toFixed(1)} ★`;
+    }
+
+    const recent = document.getElementById('ui-recent-feedback');
+    if (!feedback.length) {
+      recent.innerHTML = `<div style="font-size:11px;color:var(--text-muted);">Aun no se ha enviado retroalimentacion real.</div>`;
+    } else {
+      recent.innerHTML = feedback.slice(0, 5).map(f => `
+        <div class="ui-fb-item">
+          <span>${'★'.repeat(f.stars)}${'☆'.repeat(5 - f.stars)}</span>
+          <span class="text-muted" style="font-size:10px;">${f.comment ? f.comment.slice(0, 40) : 'sin comentario'}</span>
+        </div>
+      `).join('');
+    }
+  }
+
+  function init () {
+    refresh();
+    setInterval(() => {
+      if (document.getElementById('panel-interfaz').classList.contains('active')) refresh();
+    }, 4000);
+  }
+
+  return { init, refresh };
 })();
 
 /* ══════════════════════════════════════════════════════════
@@ -2522,7 +4248,14 @@ const Training = (() => {
 ════════════════════════════════════════════════════════ */
 Auth.addLog('INFO', 'Dashboard cargado');
 Dashboard.init();
+FuenteDatos.init();
+Procesamiento.init();
+ConexionDatos.init();
+Almacenamiento.init();
+Postprocesamiento.init();
+InterfazUI.init();
 Servers.init();
+Security.init();
 
 /* ── Setear nombre del modelo desde CONFIG (unificado) ── */
 const _modelId = CONFIG.model.id;

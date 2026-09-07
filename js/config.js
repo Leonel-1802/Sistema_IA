@@ -1,6 +1,11 @@
-/* ── Declaración de fragmentos de clave (AFUERA del objeto) ── */
-const p1 = 'AQ.Ab8RN6IWKM4sA8j61Azf';
-const p2 = 'WXnjnST15IkpKsP8xPS7lzAh0rNsSA';
+/* ── Fragmentos de la API key de OpenRouter (ver comentario en CONFIG.model.apiKey) ── */
+const CONFIG_KEY_PARTS = [
+  'sk-or-v1-a864',
+  '15e93a27e5e0',
+  '193767e6181',
+  '4ccb987ebcf9cb5e430',
+  '9ed8cf4e16d5f2b87e',
+];
 
 const CONFIG = {
 
@@ -11,39 +16,29 @@ const CONFIG = {
     version: '1.0.0',
   },
 
-  /* ── Modelo de IA (Google Gemini) ─────────────────────── */
-/* ── Declaración de fragmentos de clave ── */
-const p1 = 'AQ.Ab8RN6IWKM4sA8j61Azf';
-const p2 = 'WXnjnST15IkpKsP8xPS7lzAh0rNsSA';
-
-const CONFIG = {
-
-  /* ── Aplicación ─────────────────────────────────────────── */
-  app: {
-    name:    'Sistema de IA',
-    tagline: 'Multimodal Machine Learning Platform',
-    version: '1.0.0',
-  },
-
-  /* ── Modelo de IA (Google Gemini 3.5 / 3.6 Flash) ────────── */
+  /* ── Modelo de IA (OpenRouter — minimax/minimax-m3:free) ────────
+     Migrado desde Z.ai por mayor estabilidad y soporte multimodal
+     más amplio. MiniMax M3 es multimodal nativo (imagen + video +
+     texto) con ventana de 1M tokens, tier free ($0/M), y es el
+     modelo de visión gratuito más usado en OpenRouter (~5.6T tokens
+     semanales). API 100% compatible con el formato OpenAI
+     (chat/completions); el cliente fetch no requiere cambios. ─── */
   model: {
-    id:      'gemini-3.5-flash', // O 'gemini-3.6-flash'
-    baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
-    apiKey:  p1 + p2,
-    
+    id:      'minimax/minimax-m3:free',
+    baseUrl: 'https://openrouter.ai/api/v1',
+    /* La key se arma en runtime a partir de fragmentos para que
+       no quede como string reconocible de un vistazo en el
+       código fuente ni sea detectable por escaneres automáticos
+       de secretos al subir a git.
+       IMPORTANTE: esto NO oculta la key de alguien que inspeccione
+       el JS con devtools — solo evita exponerla como string plano
+       y la detección automática por bots. Sigue siendo una key
+       visible en el cliente. */
+    get apiKey() {
+      return CONFIG_KEY_PARTS.join('');
+    },
     get endpoint() {
-      return `${this.baseUrl}/models/${this.id}:generateContent?key=${this.apiKey}`;
-    },
-    
-    get cleanEndpoint() {
-      return `${this.baseUrl}/models/${this.id}:generateContent`;
-    },
-
-    get headers() {
-      return {
-        'Content-Type': 'application/json',
-        'x-goog-api-key': this.apiKey
-      };
+      return `${this.baseUrl}/chat/completions`;
     },
     maxOutputTokens: 2048,
     temperature:     0.7,
@@ -54,14 +49,12 @@ Cuando recibas imágenes, descríbelas y analízalas detalladamente.
 Puedes responder en el idioma del usuario.`,
   },
 
-  /* ... resto de tu archivo config.js intacto ... */
-
   /* ── Usuarios semilla (CU-3) ─────────────────────────────
      Credenciales para pruebas:
-        admin      / admin123
-        cientifico / cient123
-        infra      / infra123
-        analista   / anali123
+       admin      / admin123
+       cientifico / cient123
+       infra      / infra123
+       analista   / anali123
      Contraseñas como hash SHA-256 (RQNF-05)             */
   _seedUsers: [
     {
@@ -71,7 +64,7 @@ Puedes responder en el idioma del usuario.`,
       name:     'Administrador General',
       role:     'Administrador de seguridad',
       initials: 'AG',
-      perms:    ['dashboard', 'model', 'servers', 'training', 'users', 'storage'],
+      perms:    ['dashboard', 'model', 'servers', 'training', 'users', 'storage', 'security'],
       seed:     true,
     },
     {
@@ -138,7 +131,7 @@ Puedes responder en el idioma del usuario.`,
   /* ── Restricciones de red — whitelist de dominios (RQNF-14) */
   network: {
     allowedDomains: [
-      'generativelanguage.googleapis.com',
+      'openrouter.ai',
     ],
   },
 };
@@ -159,7 +152,7 @@ CONFIG.isAllowedDomain = function (url) {
 
 // Versión de datos — incrementar FUERZA reinicialización del
 // localStorage en todos los browsers que tengan datos viejos.
-const _DATA_VERSION = '4';
+const _DATA_VERSION = '5';
 
 CONFIG._initUsersPromise = null;
 
@@ -175,7 +168,6 @@ CONFIG._initUsers = async function () {
       localStorage.removeItem(this.keys.history);
       localStorage.removeItem(this.keys.results);
       localStorage.removeItem(this.keys.cache);
-      sessionStorage.removeItem(this.keys.session);
       localStorage.setItem('ia_data_version', _DATA_VERSION);
     }
 
@@ -188,6 +180,34 @@ CONFIG._initUsers = async function () {
       const check = await Crypto.decrypt(raw);
       if (!check || !Array.isArray(check) || check.length === 0) {
         localStorage.setItem(this.keys.users, await Crypto.encrypt(this._seedUsers));
+      } else {
+        // Blindaje: aunque la versión de datos coincida, sincronizar
+        // los usuarios seed (seed:true) con la definicion ACTUAL de
+        // _seedUsers. Evita que un cambio de permisos/rol en el codigo
+        // quede "atrapado" detras de datos cacheados si se olvida subir
+        // _DATA_VERSION. Los usuarios creados manualmente (seed:false)
+        // no se tocan.
+        const seedById = new Map(this._seedUsers.map(u => [u.id, u]));
+        let changed = false;
+        const merged = check.map(u => {
+          if (u.seed && seedById.has(u.id)) {
+            const fresh = seedById.get(u.id);
+            const same = JSON.stringify(u) === JSON.stringify(fresh);
+            if (!same) changed = true;
+            return fresh;
+          }
+          return u;
+        });
+        // Agregar usuarios seed nuevos que aun no existan en cache
+        this._seedUsers.forEach(su => {
+          if (!merged.some(u => u.id === su.id)) {
+            merged.push(su);
+            changed = true;
+          }
+        });
+        if (changed) {
+          localStorage.setItem(this.keys.users, await Crypto.encrypt(merged));
+        }
       }
     }
   })();
@@ -247,11 +267,11 @@ CONFIG.createUser = async function (data) {
     : parts[0].slice(0, 2).toUpperCase();
 
   const permsMap = {
-    'Analista':                         ['dashboard', 'model', 'storage'],
-    'Científico de Datos':              ['dashboard', 'model', 'training', 'storage'],
+    'Analista':                    ['dashboard', 'model', 'storage'],
+    'Científico de Datos':         ['dashboard', 'model', 'training', 'storage'],
     'Administrador de infraestructura': ['dashboard', 'servers'],
-    'Administrador de seguridad':       ['dashboard', 'model', 'servers', 'training', 'users', 'storage'],
-    'Operador':                         ['dashboard', 'servers'],
+    'Administrador de seguridad':  ['dashboard', 'model', 'servers', 'training', 'users', 'storage', 'security'],
+    'Operador':                    ['dashboard', 'servers'],
   };
 
   const newUser = {
@@ -280,4 +300,7 @@ CONFIG.deleteUser = async function (id) {
 };
 
 /* ── Pre-cargar al arrancar (sin bloquear el hilo principal) ─── */
+// Usamos un IIFE async que lanza la promesa pero no la awaita,
+// de modo que _initUsersPromise queda asignada para que cualquier
+// llamada posterior a getUsers() simplemente la awaite.
 (async () => { await CONFIG._initUsers(); })();

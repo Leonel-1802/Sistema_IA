@@ -16,6 +16,7 @@ const Auth = (() => {
   let _logsReady = _loadLogs();
 
   async function _loadLogs () {
+    await CONFIG._initUsers();
     const raw = localStorage.getItem(CONFIG.keys.logs);
     _logsCache = (await Crypto.decrypt(raw)) || [];
     return _logsCache;
@@ -27,6 +28,7 @@ const Auth = (() => {
 
   /* ── Inicializar: restaurar sesión guardada (async — datos cifrados) ── */
   async function init () {
+    await CONFIG._initUsers();
     const raw = sessionStorage.getItem(CONFIG.keys.session);
     const saved = await Crypto.decrypt(raw);
     if (saved) {
