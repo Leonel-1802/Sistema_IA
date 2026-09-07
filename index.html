@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema de IA — Inicio de Sesion</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* ── Estilos login ───────────────────────── */
+    .login-visual-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 16px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+    }
+    .diagram-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .diagram-node {
+      flex: 1;
+      padding: 6px 10px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      white-space: nowrap;
+    }
+    .diagram-node.active {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-dim);
+    }
+    .diagram-arrow {
+      color: var(--border-light);
+      font-size: 10px;
+      flex-shrink: 0;
+    }
+    .diagram-arrow.v {
+      text-align: center;
+      color: var(--border);
+      font-size: 9px;
+      margin-left: 48%;
+    }
+    .input-icon-wrap { position: relative; }
+    .input-icon-wrap .form-input { padding-left: 36px; }
+    .input-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    .input-icon svg { width: 15px; height: 15px; }
+    .password-toggle {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 2px;
+      display: flex;
+      align-items: center;
+    }
+    .password-toggle:hover { color: var(--text-secondary); }
+    .password-toggle svg { width: 15px; height: 15px; }
+
+    /* Hint de credenciales de prueba */
+    .login-creds-hint {
+      margin-top: 12px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 8px 12px;
+      font-size: 11px;
+    }
+    .login-creds-hint summary {
+      cursor: pointer;
+      color: var(--text-muted);
+      user-select: none;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .login-creds-hint summary:hover { color: var(--text-secondary); }
+    .login-creds-hint table {
+      margin-top: 8px;
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+    }
+    .login-creds-hint th {
+      text-align: left;
+      color: var(--text-muted);
+      font-size: 10px;
+      padding: 3px 6px;
+      border-bottom: 1px solid var(--border);
+      text-transform: uppercase;
+    }
+    .login-creds-hint td {
+      padding: 4px 6px;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .login-creds-hint td:first-child { color: var(--primary); }
+    .login-creds-hint tr:last-child td { border-bottom: none; }
+    .login-creds-hint tr:hover td { background: var(--bg-hover); }
+  </style>
+</head>
+<body>
+
+<div class="login-page">
+
+  <!-- Panel izquierdo: visual informativo -->
+  <aside class="login-panel-left">
+
+    <div class="login-brand">
+      <div class="login-brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+        </svg>
+      </div>
+      <div>
+        <div class="login-brand-name">Sistema de IA</div>
+        <div class="login-brand-sub">Multimodal Machine Learning</div>
+      </div>
+    </div>
+
+    <div class="login-visual">
+      <div>
+        <div class="login-visual-title">Plataforma de<br>Inteligencia Artificial<br>Multimodal</div>
+        <div class="login-visual-desc" style="margin-top:12px;">
+          Sistema integrado de 9 subsistemas para procesamiento, inferencia y visualizacion de datos con modelo LMM.
+        </div>
+      </div>
+
+      <div class="login-visual-diagram">
+        <div class="diagram-row">
+          <div class="diagram-node active">Fuente de Datos</div>
+          <div class="diagram-arrow">&#8594;</div>
+          <div class="diagram-node active">Procesamiento</div>
+          <div class="diagram-arrow">&#8594;</div>
+          <div class="diagram-node">Conexion</div>
+        </div>
+        <div class="diagram-arrow v">&#8595;</div>
+        <div class="diagram-row">
+          <div class="diagram-node">Almacenamiento</div>
+          <div class="diagram-arrow">&#8592;</div>
+          <div class="diagram-node active">Modelo IA / MML</div>
+          <div class="diagram-arrow">&#8592;</div>
+          <div class="diagram-node">Ciberseguridad</div>
+        </div>
+        <div class="diagram-arrow v">&#8595;</div>
+        <div class="diagram-row">
+          <div class="diagram-node">Interfaz / UI</div>
+          <div class="diagram-arrow">&#8592;</div>
+          <div class="diagram-node">Postprocesamiento</div>
+          <div class="diagram-arrow" style="visibility:hidden;">&#8592;</div>
+          <div class="diagram-node">Servidores</div>
+        </div>
+      </div>
+
+      <div class="login-subsystem-list">
+        <div class="login-subsystem-item">Validacion y normalizacion de datos en tiempo real</div>
+        <div class="login-subsystem-item">Inferencia multimodal — texto, imagenes y audio</div>
+        <div class="login-subsystem-item">Monitor de servidores distribuidos (RQF-09)</div>
+        <div class="login-subsystem-item">Generacion de reportes y visualizaciones</div>
+        <div class="login-subsystem-item">Registro de auditoria y control de accesos</div>
+      </div>
+    </div>
+
+    <div class="login-footer">
+      Version 1.0.0 &nbsp;|&nbsp; &copy; 2026 Sistema de IA
+    </div>
+
+  </aside>
+
+  <!-- Panel derecho: formulario de login -->
+  <main class="login-panel-right">
+    <div class="login-form-wrap">
+
+      <div id="login-alert" class="alert alert-error hidden">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span id="login-alert-msg">Credenciales incorrectas.</span>
+      </div>
+
+      <form class="login-form" id="login-form" autocomplete="off">
+
+        <div style="margin-bottom:8px;">
+          <div style="font-size:20px;font-weight:700;color:var(--text-primary);">Iniciar Sesion</div>
+          <div style="font-size:13px;color:var(--text-secondary);margin-top:4px;">
+            Ingrese sus credenciales para acceder al sistema.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="username">Usuario</label>
+          <div class="input-icon-wrap">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+            </span>
+            <input class="form-input" type="text" id="username" name="username"
+              placeholder="Nombre de usuario" autocomplete="username" spellcheck="false"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Contrasena</label>
+          <div class="input-icon-wrap" style="position:relative;">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </span>
+            <input class="form-input" type="password" id="password" name="password"
+              placeholder="Contrasena" autocomplete="current-password" style="padding-right:36px;"/>
+            <button type="button" class="password-toggle" id="toggle-password" title="Mostrar u ocultar">
+              <svg id="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg login-submit" id="login-btn">
+          <span id="login-btn-text">Ingresar al sistema</span>
+          <span id="login-btn-spinner" class="spinner hidden"></span>
+        </button>
+
+      </form>
+
+      <!-- Credenciales de prueba — quitar en producción -->
+      <details class="login-creds-hint">
+        <summary>🔑 Credenciales de prueba</summary>
+        <table>
+          <thead><tr><th>Usuario</th><th>Contraseña</th><th>Rol</th></tr></thead>
+          <tbody>
+            <tr><td>admin</td><td>admin123</td><td>Administrador</td></tr>
+            <tr><td>cientifico</td><td>cient123</td><td>Científico de Datos</td></tr>
+            <tr><td>infra</td><td>infra123</td><td>Infraestructura</td></tr>
+            <tr><td>analista</td><td>anali123</td><td>Analista</td></tr>
+          </tbody>
+        </table>
+      </details>
+
+      <div class="login-version-note">
+        Sistema de IA v1.0.0 &nbsp;&middot;&nbsp; Acceso restringido
+      </div>
+
+    </div>
+  </main>
+
+</div>
+
+<script src="js/crypto.js"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  /* ── Redirigir si ya hay sesion activa (sesion cifrada — RQF-07) ── */
+  (async () => {
+    if (await Auth.init()) {
+      window.location.href = 'dashboard.html';
+    }
+  })();
+
+  const eyeOpen  = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+  const eyeSlash = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+
+  const pwdInput  = document.getElementById('password');
+  const toggleBtn = document.getElementById('toggle-password');
+  const eyeIcon   = document.getElementById('eye-icon');
+
+  toggleBtn.addEventListener('click', () => {
+    const isText = pwdInput.type === 'text';
+    pwdInput.type = isText ? 'password' : 'text';
+    eyeIcon.innerHTML = isText ? eyeOpen : eyeSlash;
+  });
+
+  function showLoginAlert (msg) {
+    document.getElementById('login-alert-msg').textContent = msg;
+    document.getElementById('login-alert').classList.remove('hidden');
+  }
+
+  function hideLoginAlert () {
+    document.getElementById('login-alert').classList.add('hidden');
+  }
+
+  function setLoginLoading (on) {
+    const btn = document.getElementById('login-btn');
+    btn.disabled = on;
+    document.getElementById('login-btn-text').textContent = on ? 'Verificando...' : 'Ingresar al sistema';
+    document.getElementById('login-btn-spinner').classList.toggle('hidden', !on);
+  }
+
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideLoginAlert();
+
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+
+    if (!username || !password) {
+      showLoginAlert('Complete todos los campos para continuar.');
+      return;
+    }
+
+    setLoginLoading(true);
+
+    const result = await Auth.login(username, password);
+
+    if (result.ok) {
+      document.getElementById('login-btn-text').textContent = 'Acceso concedido...';
+      setTimeout(() => { window.location.href = 'dashboard.html'; }, 400);
+    } else {
+      setLoginLoading(false);
+      showLoginAlert(result.msg);
+      ['username', 'password'].forEach(id => {
+        const el = document.getElementById(id);
+        el.classList.add('error');
+        setTimeout(() => el.classList.remove('error'), 2000);
+      });
+      document.getElementById('username').focus();
+    }
+  });
+
+  ['username', 'password'].forEach(id => {
+    document.getElementById(id).addEventListener('input', hideLoginAlert);
+  });
+
+  document.getElementById('username').focus();
+
+  // Click en fila de credenciales → autocompleta el formulario
+  document.querySelectorAll('.login-creds-hint tbody tr').forEach(row => {
+    row.addEventListener('click', () => {
+      const cells = row.querySelectorAll('td');
+      document.getElementById('username').value = cells[0].textContent.trim();
+      document.getElementById('password').value = cells[1].textContent.trim();
+      hideLoginAlert();
+      document.getElementById('login-btn').focus();
+    });
+  });
+</script>
+
+</body>
+</html>

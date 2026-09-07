@@ -1,0 +1,2565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema de IA — Dashboard</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* ══ Dashboard ════════════════════════════════════════ */
+    #panel-dashboard {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+    }
+    #panel-dashboard.active { display: flex; }
+
+    /* KPI row */
+    .db-kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .db-kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: border-color var(--transition);
+    }
+    .db-kpi-card:hover { border-color: var(--border-light); }
+    .db-kpi-icon {
+      width: 40px; height: 40px;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .db-kpi-body { flex: 1; min-width: 0; }
+    .db-kpi-label { font-size: 11px; color: var(--text-muted); margin-bottom: 2px; }
+    .db-kpi-value { font-size: 22px; font-weight: 700; color: var(--text-primary); line-height: 1.1; }
+    .db-kpi-trend { font-size: 10px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
+    .db-kpi-trend.up { color: var(--success); }
+    .db-kpi-trend.down { color: var(--danger); }
+
+    /* Mid row */
+    .db-mid-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .db-subsystems-card, .db-nodes-card { min-width: 0; }
+
+    /* Subsystem row */
+    .db-ss-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 10px;
+      background: var(--bg-elevated);
+      border-radius: var(--radius-md);
+      font-size: 12px;
+    }
+    .db-ss-name { flex: 1; color: var(--text-secondary); }
+    .db-ss-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 20px;
+    }
+    .db-ss-badge.online  { background: var(--success-dim); color: var(--success); }
+    .db-ss-badge.warning { background: var(--warning-dim); color: var(--warning); }
+    .db-ss-badge.offline { background: var(--danger-dim);  color: var(--danger);  }
+
+    /* Node card */
+    .db-node {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .db-node-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+    }
+    .db-node-name { font-weight: 600; color: var(--text-primary); }
+    .db-node-status { font-size: 10px; }
+    .db-metric-row { display: flex; flex-direction: column; gap: 3px; }
+    .db-metric-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+    .db-metric-bar {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .db-metric-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.8s ease, background 0.3s ease;
+    }
+
+    /* Bot row */
+    .db-bot-row {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .db-model-card { min-width: 0; }
+
+    /* Activity log */
+    .db-activity-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+    }
+    .db-activity-item:last-child { border-bottom: none; }
+    .db-activity-time { color: var(--text-muted); font-family: var(--font-mono); flex-shrink: 0; min-width: 44px; }
+    .db-activity-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .db-activity-msg { color: var(--text-secondary); flex: 1; }
+
+    /* ── Status bar ─────────────────────────────────────── */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 6px 24px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--text-muted);
+      overflow-x: auto;
+    }
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ── Chat panel ─────────────────────────────────────── */
+    #panel-model {
+      height: calc(100vh - var(--topbar-height) - 24px - 34px - 73px);
+      display: none;
+      flex-direction: column;
+    }
+    #panel-model.active { display: flex; }
+
+    .model-shell {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 16px;
+      overflow: hidden;
+    }
+
+    .chat-main {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 0;
+    }
+
+    .chat-empty {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+    .chat-empty-icon {
+      width: 48px; height: 48px;
+      background: var(--bg-elevated);
+      border-radius: var(--radius-lg);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 4px;
+    }
+    .chat-empty-icon svg { width: 24px; height: 24px; }
+
+    /* Mensajes */
+    .message {
+      display: flex;
+      gap: 10px;
+      max-width: 88%;
+    }
+    .message.user { align-self: flex-end; flex-direction: row-reverse; }
+    .message.assistant { align-self: flex-start; }
+
+    .message-avatar {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .message.user .message-avatar {
+      background: var(--primary-dim);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+    .message.assistant .message-avatar {
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .message-content { display: flex; flex-direction: column; gap: 4px; }
+
+    .message-bubble {
+      padding: 10px 14px;
+      border-radius: var(--radius-lg);
+      font-size: 13px;
+      line-height: 1.65;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .message.user .message-bubble {
+      background: var(--primary);
+      color: #fff;
+      border-bottom-right-radius: var(--radius-sm);
+    }
+    .message.assistant .message-bubble {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: var(--radius-sm);
+    }
+    .message-bubble img {
+      max-width: 100%;
+      border-radius: var(--radius-md);
+      margin-top: 8px;
+      display: block;
+    }
+    .message-time { font-size: 10px; color: var(--text-muted); }
+    .message.user .message-time { text-align: right; }
+
+    /* Retroalimentacion inline — CU-5 */
+    .feedback-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+    .feedback-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      font-size: 11px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .feedback-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .feedback-btn.active { border-color: var(--success); color: var(--success); background: var(--success-dim); }
+    .feedback-btn svg { width: 11px; height: 11px; }
+
+    /* Modal retroalimentacion */
+    .feedback-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 300;
+      backdrop-filter: blur(3px);
+    }
+    .feedback-modal-overlay.hidden { display: none; }
+    .feedback-modal {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .feedback-modal-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .feedback-stars {
+      display: flex;
+      gap: 6px;
+    }
+    .star-btn {
+      background: none;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+      color: var(--border);
+      transition: color 0.15s;
+      line-height: 1;
+    }
+    .star-btn.lit { color: #f59e0b; }
+    .feedback-textarea {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      padding: 9px 12px;
+      font-size: 13px;
+      resize: vertical;
+      min-height: 80px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    .feedback-textarea:focus { border-color: var(--primary); }
+    .feedback-modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    /* Typing */
+    .typing-indicator {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      padding: 12px 14px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      border-bottom-left-radius: var(--radius-sm);
+      width: fit-content;
+    }
+    .typing-dot {
+      width: 6px; height: 6px;
+      background: var(--text-muted);
+      border-radius: 50%;
+      animation: bounce 1.2s infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-5px); }
+    }
+
+    /* Input area */
+    .chat-input-area {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-surface);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .chat-image-preview {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .chat-image-thumb {
+      position: relative;
+      width: 52px; height: 52px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .chat-image-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .chat-image-remove {
+      position: absolute;
+      top: 2px; right: 2px;
+      width: 16px; height: 16px;
+      background: rgba(0,0,0,0.75);
+      border-radius: 50%;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; line-height: 1;
+    }
+    /* ── Chip de documento adjunto (PDF/TXT/CSV) — CU-1 multimodal ── */
+    .chat-doc-chip {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      height: 52px;
+      padding: 0 26px 0 8px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      flex-shrink: 0;
+      max-width: 160px;
+    }
+    .chat-doc-chip svg { width: 18px; height: 18px; color: var(--primary); flex-shrink: 0; }
+    .chat-doc-chip-info { display: flex; flex-direction: column; overflow: hidden; }
+    .chat-doc-chip-name { font-size: 10px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; }
+    .chat-doc-chip-meta { font-size: 9px; color: var(--text-muted); text-transform: uppercase; }
+    /* ── Menú de tipos de adjunto ── */
+    .attach-menu {
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 0;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+      display: none;
+      flex-direction: column;
+      min-width: 190px;
+      z-index: 20;
+      overflow: hidden;
+    }
+    .attach-menu.visible { display: flex; }
+    .attach-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      background: none;
+      border: none;
+      text-align: left;
+      font-family: inherit;
+    }
+    .attach-menu-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .attach-menu-item svg { width: 15px; height: 15px; color: var(--text-muted); flex-shrink: 0; }
+    .attach-menu-item small { color: var(--text-muted); font-weight: 400; margin-left: auto; font-size: 10px; }
+
+    .chat-input-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+    .chat-textarea {
+      flex: 1;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      padding: 9px 12px;
+      font-size: 13px;
+      resize: none;
+      outline: none;
+      min-height: 40px; max-height: 120px;
+      line-height: 1.5;
+      transition: border-color var(--transition);
+      font-family: inherit;
+    }
+    .chat-textarea::placeholder { color: var(--text-muted); }
+    .chat-textarea:focus { border-color: var(--primary); }
+    /* Borde rojo de validación CU-1 */
+    .chat-textarea.input-error { border-color: var(--danger) !important; }
+
+    .chat-tool-btn {
+      width: 38px; height: 38px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition);
+      flex-shrink: 0;
+      position: relative;
+    }
+    .chat-tool-btn:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-light); }
+    .chat-tool-btn svg { width: 16px; height: 16px; }
+
+    .chat-send-btn {
+      width: 38px; height: 38px;
+      background: var(--primary);
+      border: none;
+      border-radius: var(--radius-md);
+      color: #fff;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background var(--transition);
+      flex-shrink: 0;
+    }
+    .chat-send-btn:hover:not(:disabled) { background: var(--primary-hover); }
+    .chat-send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .chat-send-btn svg { width: 16px; height: 16px; }
+
+    /* Validación error inline */
+    .chat-validation-msg {
+      font-size: 11px;
+      color: var(--danger);
+      display: none;
+    }
+    .chat-validation-msg.visible { display: block; }
+
+    /* Sidebar del chat */
+    .chat-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+      min-height: 0;
+    }
+
+    /* Pipeline steps */
+    .pipeline-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      color: var(--text-muted);
+      transition: all 0.3s ease;
+    }
+    .pipeline-step.active { border-color: var(--primary); background: var(--primary-dim); color: var(--text-primary); }
+    .pipeline-step.done   { border-color: var(--success); background: var(--success-dim); color: var(--success); }
+    .pipeline-step.error  { border-color: var(--danger);  background: var(--danger-dim);  color: var(--danger); }
+
+    .pipeline-connector {
+      width: 2px; height: 10px;
+      background: var(--border);
+      margin: 0 auto;
+    }
+
+    .token-hint {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-align: right;
+      padding-right: 2px;
+    }
+
+    /* ── Panel Servidores (CU-2) ─────────────────────────── */
+    #panel-servers {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+    }
+    #panel-servers.active { display: flex; }
+
+    .servers-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .server-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: border-color 0.3s ease;
+    }
+    .server-card.alert { border-color: var(--danger); }
+    .server-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .server-card-name { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+    .server-alert-badge {
+      display: none;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--danger);
+      background: var(--danger-dim);
+      border: 1px solid var(--danger);
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+    .server-card.alert .server-alert-badge { display: flex; }
+
+    /* Alerta global */
+    .servers-alert-banner {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: var(--danger-dim);
+      border: 1px solid var(--danger);
+      border-radius: var(--radius-md);
+      color: var(--danger);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .servers-alert-banner.visible { display: flex; }
+    .servers-refresh-note {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* ── Panel Entrenamiento (CU-4) ──────────────────────── */
+    #panel-training {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+    }
+    #panel-training.active { display: flex; }
+
+    .training-layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    /* Progress bar de entrenamiento */
+    .training-progress-bar {
+      height: 8px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .training-progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    .training-log {
+      max-height: 220px;
+      overflow-y: auto;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-secondary);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .training-log-line { line-height: 1.6; }
+    .training-log-line.ok   { color: var(--success); }
+    .training-log-line.warn { color: var(--warning); }
+    .training-log-line.err  { color: var(--danger); }
+
+    /* Accuracy gauge visual */
+    .accuracy-display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 20px;
+      background: var(--bg-elevated);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+    }
+    .accuracy-value {
+      font-size: 42px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--text-primary);
+    }
+    .accuracy-value.pass { color: var(--success); }
+    .accuracy-value.fail { color: var(--danger); }
+    .accuracy-label { font-size: 11px; color: var(--text-muted); }
+    .accuracy-threshold { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* Cache de modelos */
+    .cache-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: var(--bg-elevated);
+      border-radius: var(--radius-md);
+      font-size: 12px;
+    }
+    .cache-item-name { font-weight: 600; color: var(--text-primary); }
+    .cache-item-meta { color: var(--text-muted); font-size: 11px; }
+    .cache-item-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Layout principal ──────────────────────────────────── -->
+<div class="app-layout">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+        </svg>
+      </div>
+      <div class="topbar-brand-name">Sistema de IA</div>
+    </div>
+
+    <div class="topbar-center">
+      <span class="topbar-page-title" id="topbar-page-title">Dashboard</span>
+    </div>
+
+    <div class="topbar-actions">
+      <span class="topbar-time font-mono text-sm" id="topbar-time">--:--:--</span>
+      <span class="badge badge-success flex items-center gap-1" title="Modelo activo">
+        <span class="status-dot online" style="width:5px;height:5px;box-shadow:none;"></span>
+        ${CONFIG.model.id}
+      </span>
+      <div class="topbar-user" id="topbar-user" title="Usuario activo" style="cursor:default;">
+        <div class="topbar-avatar" id="topbar-avatar">--</div>
+        <div>
+          <div class="topbar-user-name" id="topbar-user-name">Usuario</div>
+          <div class="topbar-user-role" id="topbar-user-role">Rol</div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="handleLogout()" title="Cerrar sesion" style="padding:6px 10px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Sidebar — solo ítems permitidos según rol -->
+  <nav class="sidebar" id="main-sidebar">
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Principal</div>
+
+      <!-- Dashboard: todos los roles con permiso 'dashboard' -->
+      <div class="sidebar-item active" data-view="dashboard" data-perm="dashboard" onclick="UI.navigate(this)">
+        <div class="sidebar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+          </svg>
+        </div>
+        <span class="sidebar-label">Dashboard</span>
+      </div>
+
+      <!-- Modelo IA: permiso 'model' — CU-1 -->
+      <div class="sidebar-item" data-view="model" data-perm="model" onclick="UI.navigate(this)">
+        <div class="sidebar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+          </svg>
+        </div>
+        <span class="sidebar-label">Modelo IA / MML</span>
+      </div>
+    </div>
+
+    <hr class="sidebar-divider" />
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Subsistemas</div>
+
+      <!-- Servidores: permiso 'servers' — CU-2 -->
+      <div class="sidebar-item" data-view="servers" data-perm="servers" onclick="UI.navigate(this)">
+        <div class="sidebar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"/>
+            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"/>
+            <line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/>
+          </svg>
+        </div>
+        <span class="sidebar-label">Servidores</span>
+      </div>
+
+      <!-- Entrenamiento: permiso 'model' — CU-4 -->
+      <div class="sidebar-item" data-view="training" data-perm="model" onclick="UI.navigate(this)">
+        <div class="sidebar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+        </div>
+        <span class="sidebar-label">Entrenamiento IA</span>
+      </div>
+    </div>
+
+  </nav>
+
+  <!-- Main content -->
+  <main class="main-content" id="main-content">
+
+    <!-- Status bar de subsistemas -->
+    <div class="status-bar" id="status-bar"></div>
+
+    <!-- Header de la vista activa -->
+    <div class="content-header" id="content-header">
+      <div>
+        <div class="content-title" id="content-view-title">Dashboard</div>
+        <div class="content-subtitle" id="content-view-sub">Vision general del sistema</div>
+      </div>
+      <div id="content-header-actions"></div>
+    </div>
+
+    <!-- Paneles -->
+    <div class="content-body" id="content-body">
+
+      <!-- ═══════════════════════════════════════════════════
+           PANEL: Dashboard — vista general
+      ════════════════════════════════════════════════════ -->
+      <div class="view-panel active" id="panel-dashboard">
+
+        <!-- Fila 1: KPIs -->
+        <div class="db-kpi-row">
+
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--primary-dim);color:var(--primary);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Consultas hoy</div>
+              <div class="db-kpi-value" id="kpi-queries">0</div>
+            </div>
+            <div class="db-kpi-trend up" id="kpi-queries-trend">— activas</div>
+          </div>
+
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--success-dim);color:var(--success);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Subsistemas activos</div>
+              <div class="db-kpi-value" id="kpi-subsystems">9 / 9</div>
+            </div>
+            <div class="db-kpi-trend up">100% uptime</div>
+          </div>
+
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--info-dim);color:var(--info);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Imagenes procesadas</div>
+              <div class="db-kpi-value" id="kpi-images">0</div>
+            </div>
+            <div class="db-kpi-trend" id="kpi-img-trend">sesion actual</div>
+          </div>
+
+          <div class="db-kpi-card">
+            <div class="db-kpi-icon" style="background:var(--warning-dim);color:var(--warning);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="db-kpi-body">
+              <div class="db-kpi-label">Tiempo de sesion</div>
+              <div class="db-kpi-value font-mono" id="kpi-uptime">00:00:00</div>
+            </div>
+            <div class="db-kpi-trend up">sistema activo</div>
+          </div>
+
+        </div>
+
+        <!-- Fila 2: Subsistemas + Nodos -->
+        <div class="db-mid-row">
+
+          <div class="card db-subsystems-card">
+            <div class="card-header">
+              <span class="card-title">Estado de Subsistemas</span>
+              <span class="badge badge-success" style="font-size:10px;">9 / 9 online</span>
+            </div>
+            <div class="card-body" style="padding:12px;display:flex;flex-direction:column;gap:6px;" id="db-subsystems-list"></div>
+          </div>
+
+          <div class="card db-nodes-card">
+            <div class="card-header">
+              <span class="card-title">Nodos de Procesamiento</span>
+              <span class="text-muted" style="font-size:10px;">actualiza cada 5s</span>
+            </div>
+            <div class="card-body" style="padding:12px;display:flex;flex-direction:column;gap:10px;" id="db-nodes-list"></div>
+          </div>
+
+        </div>
+
+        <!-- Fila 3: Actividad + Modelo activo -->
+        <div class="db-bot-row">
+
+          <div class="card" style="flex:1;min-width:0;">
+            <div class="card-header">
+              <span class="card-title">Actividad Reciente</span>
+              <button class="btn btn-ghost btn-sm" onclick="Dashboard.refreshLogs()" style="font-size:11px;">Actualizar</button>
+            </div>
+            <div class="card-body" style="padding:0;max-height:180px;overflow-y:auto;" id="db-activity-list"></div>
+          </div>
+
+          <div class="card db-model-card">
+            <div class="card-header">
+              <span class="card-title">Modelo Activo</span>
+              <span class="badge badge-success" style="font-size:10px;">online</span>
+            </div>
+            <div class="card-body" style="padding:14px;display:flex;flex-direction:column;gap:10px;">
+
+              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg-elevated);border-radius:var(--radius-md);border:1px solid var(--border);">
+                <div style="width:36px;height:36px;background:var(--primary-dim);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+                </div>
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--text-primary);" id="db-model-name">${CONFIG.model.id}</div>
+                  <div style="font-size:11px;color:var(--text-muted);">Google AI Studio</div>
+                </div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;">
+                <div style="display:flex;justify-content:space-between;">
+                  <span class="text-muted">Modalidades</span><span>Texto · Imagen</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                  <span class="text-muted">Salida max.</span>
+                  <span class="font-mono" id="db-max-tokens">2,048 tokens</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                  <span class="text-muted">Limite</span>
+                  <span class="font-mono">15 RPM · 1,500 RPD</span>
+                </div>
+              </div>
+
+              <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center;font-size:12px;"
+                onclick="UI.goTo('model')">
+                Ir al Modelo →
+              </button>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+      <!-- /panel-dashboard -->
+
+      <!-- ═══════════════════════════════════════════════════
+           PANEL: Modelo IA / MML — CU-1 + CU-5
+      ════════════════════════════════════════════════════ -->
+      <div class="view-panel" id="panel-model">
+
+        <div class="model-shell">
+
+          <!-- Chat principal -->
+          <div class="chat-main">
+
+            <div class="chat-messages" id="chat-messages">
+              <div class="chat-empty" id="chat-empty">
+                <div class="chat-empty-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted)">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+                  </svg>
+                </div>
+                <div style="font-size:13px;font-weight:600;color:var(--text-secondary);">Modelo IA / MML listo</div>
+                <div style="font-size:12px;max-width:280px;color:var(--text-muted);">Ingrese una consulta de texto, o adjunte una imagen o documento (PDF, TXT, CSV) para comenzar el analisis multimodal.</div>
+              </div>
+            </div>
+
+            <!-- Validacion CU-1 -->
+            <div class="chat-validation-msg" id="chat-validation-msg">
+              Complete la consulta antes de enviar.
+            </div>
+
+            <!-- Input -->
+            <div class="chat-input-area">
+              <div class="chat-image-preview" id="image-preview"></div>
+              <div class="chat-input-row" style="position:relative;">
+                <button class="chat-tool-btn" id="attach-btn" title="Adjuntar archivo" onclick="Chat.toggleAttachMenu(event)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                  </svg>
+                </button>
+                <div class="attach-menu" id="attach-menu">
+                  <button type="button" class="attach-menu-item" onclick="document.getElementById('file-input-image').click(); Chat.toggleAttachMenu(event, true)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    Imagen <small>PNG · JPG · WEBP</small>
+                  </button>
+                  <button type="button" class="attach-menu-item" onclick="document.getElementById('file-input-doc').click(); Chat.toggleAttachMenu(event, true)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    Documento <small>PDF · TXT · CSV</small>
+                  </button>
+                </div>
+                <input type="file" id="file-input-image" accept="image/png,image/jpeg,image/webp,image/heic,image/heif" style="display:none;" multiple/>
+                <input type="file" id="file-input-doc" accept=".pdf,.txt,.csv,application/pdf,text/plain,text/csv" style="display:none;" multiple/>
+                <textarea class="chat-textarea" id="chat-input"
+                  placeholder="Ingrese su consulta... (Enter para enviar, Shift+Enter para nueva linea)"
+                  rows="1"></textarea>
+                <button class="chat-send-btn" id="send-btn" title="Enviar consulta">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                  </svg>
+                </button>
+              </div>
+              <div class="token-hint" id="token-hint"></div>
+            </div>
+
+          </div>
+
+          <!-- Sidebar: pipeline + sesion -->
+          <div class="chat-sidebar">
+
+            <div class="card">
+              <div class="card-header" style="padding:12px 16px;">
+                <span class="card-title" style="font-size:11px;">Flujo de Subsistemas (Documento)</span>
+              </div>
+              <div class="card-body" style="padding:12px;display:flex;flex-direction:column;gap:4px;">
+                <div class="pipeline-step" id="ps-input" title="Portal de entrada de datos">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+                  Fuente de Datos
+                </div>
+                <div class="pipeline-connector"></div>
+                <div class="pipeline-step" id="ps-proc" title="Validador + Normalizador (RQF-02, RQF-03)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                  Procesamiento (Validación)
+                </div>
+                <div class="pipeline-connector"></div>
+                <div class="pipeline-step" id="ps-conn" title="Canales de comunicación (RQF-05)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+                  Conexión de Datos
+                </div>
+                <div class="pipeline-connector"></div>
+                <div class="pipeline-step" id="ps-model" title="Red neuronal / Motor de inferencia">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+                  Modelo IA / MML
+                </div>
+                <div class="pipeline-connector"></div>
+                <div class="pipeline-step" id="ps-store" title="Base de datos de resultados + Caché de modelos">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>
+                  Almacenamiento
+                </div>
+                <div class="pipeline-connector"></div>
+                <div class="pipeline-step" id="ps-post" title="Formateador de resultados + Generador de reportes (RQF-15, RQF-16)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  Postprocesamiento
+                </div>
+                <div class="pipeline-connector"></div>
+                <div class="pipeline-step" id="ps-out" title="Dashboard interactivo / Portal de salida">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                  Interfaz / UI
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header" style="padding:12px 16px;">
+                <span class="card-title" style="font-size:11px;">Almacenamiento — Subsistema</span>
+              </div>
+              <div class="card-body" style="padding:12px;display:flex;flex-direction:column;gap:8px;font-size:12px;">
+                <div style="display:flex;justify-content:space-between;">
+                  <span class="text-muted">Base de datos de resultados</span>
+                  <span id="stat-stored-results" class="font-mono">0</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                  <span class="text-muted">Caché de modelo</span>
+                  <span style="display:flex;align-items:center;gap:5px;">
+                    <span class="status-dot online" style="width:6px;height:6px;"></span>
+                    <span class="font-mono" style="font-size:11px;color:var(--success);">activa</span>
+                  </span>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                  <span class="text-muted">Version modelo en cache</span>
+                  <span id="stat-cache-version" class="font-mono" style="font-size:10px;">—</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header" style="padding:12px 16px;">
+                <span class="card-title" style="font-size:11px;">Sesion Actual</span>
+              </div>
+              <div class="card-body" style="padding:12px;display:flex;flex-direction:column;gap:8px;font-size:12px;">
+                <div style="display:flex;justify-content:space-between;">
+                  <span class="text-muted">Consultas</span>
+                  <span id="stat-queries" class="font-mono">0</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                  <span class="text-muted">Con imagen</span>
+                  <span id="stat-images" class="font-mono">0</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                  <span class="text-muted">Retroalimentaciones</span>
+                  <span id="stat-feedbacks" class="font-mono">0</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                  <span class="text-muted">Historial</span>
+                  <span id="stat-history" class="font-mono">0 msgs</span>
+                </div>
+                <hr style="border:none;border-top:1px solid var(--border);margin:4px 0;">
+                <button class="btn btn-ghost btn-sm" onclick="Chat.clearHistory()" style="width:100%;justify-content:center;font-size:11px;">
+                  Limpiar historial
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+
+        </div>
+
+      </div>
+      <!-- /panel-model -->
+
+      <!-- ═══════════════════════════════════════════════════
+           PANEL: Servidores — CU-2
+      ════════════════════════════════════════════════════ -->
+      <div class="view-panel" id="panel-servers">
+
+        <!-- Alerta global -->
+        <div class="servers-alert-banner" id="servers-alert-banner">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span id="servers-alert-msg">Alerta: uno o mas servidores superan el 90% de capacidad.</span>
+          <span class="servers-refresh-note" id="servers-last-update">actualiza cada 5s</span>
+        </div>
+
+        <!-- Grid de nodos -->
+        <div class="servers-grid" id="servers-grid"></div>
+
+        <!-- Historial de alertas -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Historial de Alertas de Infraestructura</span>
+            <span class="text-muted" style="font-size:10px;" id="servers-alert-count">Sin alertas</span>
+          </div>
+          <div class="card-body" style="padding:0;max-height:200px;overflow-y:auto;" id="servers-alert-log"></div>
+        </div>
+
+      </div>
+      <!-- /panel-servers -->
+
+      <!-- ═══════════════════════════════════════════════════
+           PANEL: Entrenamiento IA — CU-4
+      ════════════════════════════════════════════════════ -->
+      <div class="view-panel" id="panel-training">
+
+        <div class="training-layout">
+
+          <!-- Columna izquierda: formulario + progreso -->
+          <div style="display:flex;flex-direction:column;gap:16px;">
+
+            <!-- Formulario de configuracion -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Configuracion de Entrenamiento</span>
+                <span class="badge" id="training-status-badge" style="font-size:10px;background:var(--bg-elevated);color:var(--text-muted);border:1px solid var(--border);">Listo</span>
+              </div>
+              <div class="card-body" style="display:flex;flex-direction:column;gap:14px;">
+
+                <div class="form-group">
+                  <label class="form-label">Conjunto de datos</label>
+                  <select class="form-select-styled" id="training-dataset">
+                    <option value="">— Seleccione un dataset —</option>
+                    <option value="ds-text-001">DS-TEXT-001 · Consultas de texto (1,200 muestras)</option>
+                    <option value="ds-img-001">DS-IMG-001 · Analisis de imagenes (850 muestras)</option>
+                    <option value="ds-mixed-001">DS-MIXED-001 · Multimodal combinado (2,050 muestras)</option>
+                    <option value="ds-feedback-001">DS-FEEDBACK-001 · Retroalimentaciones capturadas (430 muestras)</option>
+                  </select>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                  <div class="form-group">
+                    <label class="form-label">Epocas</label>
+                    <input class="form-input" type="number" id="training-epochs" value="10" min="1" max="100" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Tasa de aprendizaje</label>
+                    <input class="form-input" type="number" id="training-lr" value="0.001" step="0.0001" min="0.0001" max="0.1" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Umbral de precision minima</label>
+                  <div style="display:flex;align-items:center;gap:10px;">
+                    <input class="form-input" type="number" id="training-threshold" value="90" min="50" max="100" style="max-width:100px;" />
+                    <span class="text-muted" style="font-size:12px;">% (RQNF-08: minimo 90%)</span>
+                  </div>
+                </div>
+
+                <div id="training-validation-msg" style="font-size:12px;color:var(--danger);display:none;"></div>
+
+                <div style="display:flex;gap:8px;">
+                  <button class="btn btn-primary" id="training-start-btn" onclick="Training.start()">
+                    Iniciar entrenamiento
+                  </button>
+                  <button class="btn btn-ghost btn-sm" id="training-reset-btn" onclick="Training.reset()" style="display:none;">
+                    Reiniciar
+                  </button>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Progreso -->
+            <div class="card" id="training-progress-card" style="display:none;">
+              <div class="card-header">
+                <span class="card-title">Progreso de Entrenamiento</span>
+                <span id="training-epoch-counter" style="font-size:11px;color:var(--text-muted);">Epoca 0 / 0</span>
+              </div>
+              <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:4px;">
+                    <span>Progreso</span>
+                    <span id="training-pct">0%</span>
+                  </div>
+                  <div class="training-progress-bar">
+                    <div class="training-progress-fill" id="training-progress-fill"></div>
+                  </div>
+                </div>
+                <div class="training-log" id="training-log"></div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Columna derecha: precision + cache -->
+          <div style="display:flex;flex-direction:column;gap:16px;">
+
+            <!-- Display de precision -->
+            <div class="card">
+              <div class="card-header"><span class="card-title">Precision del Modelo</span></div>
+              <div class="card-body" style="padding:12px;">
+                <div class="accuracy-display">
+                  <div class="accuracy-value" id="accuracy-value">—</div>
+                  <div class="accuracy-label" id="accuracy-label">Sin entrenamiento</div>
+                  <div class="accuracy-threshold">Umbral minimo: <strong>90%</strong></div>
+                </div>
+                <div id="accuracy-result-msg" style="margin-top:12px;font-size:12px;display:none;"></div>
+              </div>
+            </div>
+
+            <!-- Cache de modelos -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Cache de Modelos</span>
+                <span class="text-muted" style="font-size:10px;" id="cache-count">0 versiones</span>
+              </div>
+              <div class="card-body" style="display:flex;flex-direction:column;gap:8px;padding:12px;" id="cache-list">
+                <div style="font-size:12px;color:var(--text-muted);">No hay versiones entrenadas almacenadas.</div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+      <!-- /panel-training -->
+
+    </div>
+    <!-- /content-body -->
+
+  </main>
+</div>
+
+<!-- ── Modal de Retroalimentacion — CU-5 ────────────────── -->
+<div class="feedback-modal-overlay hidden" id="feedback-overlay">
+  <div class="feedback-modal">
+    <div class="feedback-modal-title">Enviar Retroalimentacion</div>
+    <div style="font-size:12px;color:var(--text-muted);">Califica la respuesta y agrega comentarios o correcciones.</div>
+
+    <div>
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px;">Calificacion</div>
+      <div class="feedback-stars" id="feedback-stars">
+        <button class="star-btn" data-star="1" onclick="Feedback.setStar(1)">★</button>
+        <button class="star-btn" data-star="2" onclick="Feedback.setStar(2)">★</button>
+        <button class="star-btn" data-star="3" onclick="Feedback.setStar(3)">★</button>
+        <button class="star-btn" data-star="4" onclick="Feedback.setStar(4)">★</button>
+        <button class="star-btn" data-star="5" onclick="Feedback.setStar(5)">★</button>
+      </div>
+    </div>
+
+    <div>
+      <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:6px;">Observacion o correccion</label>
+      <textarea class="feedback-textarea" id="feedback-comment" placeholder="Describa que estuvo bien, que fallo o como mejorar la respuesta..."></textarea>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:8px;">
+      <input type="checkbox" id="feedback-reprocess" style="cursor:pointer;">
+      <label for="feedback-reprocess" style="font-size:12px;color:var(--text-secondary);cursor:pointer;">
+        Solicitar reprocesamiento con nueva informacion
+      </label>
+    </div>
+
+    <div class="feedback-modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="Feedback.close()">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="Feedback.save()">Guardar retroalimentacion</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Scripts ───────────────────────────────────────────── -->
+<script src="js/crypto.js"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script>
+
+/* ══════════════════════════════════════════════════════════
+   INIT — verificar sesion y aplicar permisos al sidebar
+   (async: la sesion viaja cifrada — RQF-07 / RQNF-05)
+════════════════════════════════════════════════════════ */
+(async () => {
+  const user = await Auth.require();
+
+  if (user) {
+    document.getElementById('topbar-avatar').textContent    = user.initials;
+    document.getElementById('topbar-user-name').textContent = user.name;
+    document.getElementById('topbar-user-role').textContent = user.role;
+
+    // Ocultar items del sidebar que el usuario no tiene permiso
+    document.querySelectorAll('.sidebar-item[data-perm]').forEach(item => {
+      const perm = item.dataset.perm;
+      if (!Auth.can(perm)) {
+        item.style.display = 'none';
+      }
+    });
+  }
+})();
+
+/* ── Status bar de subsistemas ─────────────────────────── */
+const statusBar = document.getElementById('status-bar');
+CONFIG.subsystems.forEach(s => {
+  const item = document.createElement('div');
+  item.className = 'status-item';
+  item.innerHTML = `<span class="status-dot ${s.status}" id="ss-${s.id}"></span><span>${s.label}</span>`;
+  statusBar.appendChild(item);
+});
+
+/* ── Reloj ─────────────────────────────────────────────── */
+function updateClock () {
+  document.getElementById('topbar-time').textContent =
+    new Date().toTimeString().slice(0, 8);
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+/* ── Logout ────────────────────────────────────────────── */
+function handleLogout () {
+  Auth.logout();
+  window.location.href = 'index.html';
+}
+
+/* ══════════════════════════════════════════════════════════
+   UI — navegacion entre paneles
+════════════════════════════════════════════════════════ */
+const UI = (() => {
+  const views = {
+    'dashboard': { title: 'Dashboard',          sub: 'Vision general del sistema' },
+    'model':     { title: 'Modelo IA / MML',    sub: 'Portal de consultas multimodal — CU-1' },
+    'servers':   { title: 'Servidores',          sub: 'Monitor de salud y recursos en tiempo real — CU-2' },
+    'training':  { title: 'Entrenamiento IA',   sub: 'Motor de aprendizaje del modelo — CU-4' },
+  };
+
+  function navigate (el) {
+    const view = el.dataset.view;
+    const perm = el.dataset.perm;
+
+    // Verificar permiso
+    if (perm && !Auth.can(perm)) {
+      Auth.addLog('WARN', `Acceso denegado a la vista: ${view}`);
+      return;
+    }
+
+    document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+
+    document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+    const panel = document.getElementById('panel-' + view);
+    if (panel) panel.classList.add('active');
+
+    const meta = views[view] || { title: view, sub: '' };
+    document.getElementById('topbar-page-title').textContent  = meta.title;
+    document.getElementById('content-view-title').textContent = meta.title;
+    document.getElementById('content-view-sub').textContent   = meta.sub;
+
+    // El panel model necesita height controlada
+    const body = document.getElementById('content-body');
+    if (view === 'model') {
+      body.style.padding      = '16px';
+      body.style.overflow     = 'hidden';
+      body.style.flex         = '1';
+      body.style.display      = 'flex';
+      body.style.flexDirection = 'column';
+      panel.style.flex        = '1';
+      panel.style.overflow    = 'hidden';
+    } else {
+      body.style.padding       = '24px';
+      body.style.overflow      = '';
+      body.style.flex          = '';
+      body.style.display       = '';
+      body.style.flexDirection = '';
+    }
+  }
+
+  function goTo (viewName) {
+    const el = document.querySelector(`[data-view="${viewName}"]`);
+    if (el) navigate(el);
+  }
+
+  return { navigate, goTo };
+})();
+
+/* ══════════════════════════════════════════════════════════
+   DASHBOARD
+════════════════════════════════════════════════════════ */
+const Dashboard = (() => {
+
+  const _nodes = [
+    { id: 'node-1', name: 'Nodo A', cpu: 42, ram: 58, gpu: 35 },
+    { id: 'node-2', name: 'Nodo B', cpu: 67, ram: 72, gpu: 81 },
+    { id: 'node-3', name: 'Nodo C', cpu: 23, ram: 41, gpu: 19 },
+  ];
+
+  let _sessionStart = Date.now();
+  let _queryCount   = 0;
+  let _imageCount   = 0;
+
+  function registerQuery (hasImages, imgCount) {
+    _queryCount++;
+    if (hasImages) _imageCount += imgCount;
+    _renderKPIs();
+  }
+
+  function _renderKPIs () {
+    const q = document.getElementById('kpi-queries');
+    const i = document.getElementById('kpi-images');
+    const t = document.getElementById('kpi-queries-trend');
+    if (q) q.textContent = _queryCount;
+    if (i) i.textContent = _imageCount;
+    if (t) t.textContent = _queryCount === 1 ? '1 consulta' : `${_queryCount} consultas`;
+  }
+
+  function _renderUptime () {
+    const el = document.getElementById('kpi-uptime');
+    if (!el) return;
+    const diff = Math.floor((Date.now() - _sessionStart) / 1000);
+    const h = String(Math.floor(diff / 3600)).padStart(2, '0');
+    const m = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
+    const s = String(diff % 60).padStart(2, '0');
+    el.textContent = `${h}:${m}:${s}`;
+  }
+
+  function _renderSubsystems () {
+    const container = document.getElementById('db-subsystems-list');
+    if (!container) return;
+    container.innerHTML = CONFIG.subsystems.map(s => `
+      <div class="db-ss-row">
+        <span class="status-dot online" style="flex-shrink:0;"></span>
+        <span class="db-ss-name">${s.label}</span>
+        <span class="db-ss-badge online">online</span>
+      </div>
+    `).join('');
+  }
+
+  function _fluctuate (val, min, max, delta) {
+    const next = val + (Math.random() - 0.5) * delta;
+    return Math.max(min, Math.min(max, Math.round(next)));
+  }
+
+  function _metricColor (pct) {
+    if (pct >= 90) return 'var(--danger)';
+    if (pct >= 70) return 'var(--warning)';
+    return 'var(--primary)';
+  }
+
+  function _renderNodes () {
+    const container = document.getElementById('db-nodes-list');
+    if (!container) return;
+    _nodes.forEach(n => {
+      n.cpu = _fluctuate(n.cpu, 5, 98, 8);
+      n.ram = _fluctuate(n.ram, 20, 95, 5);
+      n.gpu = _fluctuate(n.gpu, 5, 98, 10);
+    });
+    container.innerHTML = _nodes.map(n => {
+      const alert = n.cpu >= 90 || n.ram >= 90 || n.gpu >= 90;
+      return `
+        <div class="db-node" style="${alert ? 'border-color:var(--danger);' : ''}">
+          <div class="db-node-header">
+            <span class="db-node-name">${n.name}</span>
+            <span class="db-node-status ${alert ? 'text-danger' : 'text-success'}">
+              ${alert ? '⚠ Alerta' : '● Activo'}
+            </span>
+          </div>
+          ${_metricRow('CPU', n.cpu)}
+          ${_metricRow('RAM', n.ram)}
+          ${_metricRow('GPU', n.gpu)}
+        </div>
+      `;
+    }).join('');
+  }
+
+  function _metricRow (label, pct) {
+    return `
+      <div class="db-metric-row">
+        <div class="db-metric-label">
+          <span>${label}</span>
+          <span class="font-mono" style="color:${_metricColor(pct)}">${pct}%</span>
+        </div>
+        <div class="db-metric-bar">
+          <div class="db-metric-fill" style="width:${pct}%;background:${_metricColor(pct)};"></div>
+        </div>
+      </div>
+    `;
+  }
+
+  async function refreshLogs () {
+    const container = document.getElementById('db-activity-list');
+    if (!container) return;
+    const logs = (await Auth.getLogs()).slice(0, 12);
+    if (!logs.length) {
+      container.innerHTML = '<div style="padding:14px;color:var(--text-muted);font-size:12px;">Sin actividad reciente.</div>';
+      return;
+    }
+    const colorMap = { INFO: 'var(--info)', WARN: 'var(--warning)', ERROR: 'var(--danger)' };
+    container.innerHTML = logs.map(l => {
+      const t = new Date(l.ts).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+      return `
+        <div class="db-activity-item">
+          <span class="db-activity-time">${t}</span>
+          <span class="db-activity-dot" style="background:${colorMap[l.level] || 'var(--border)'}"></span>
+          <span class="db-activity-msg">${l.msg}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function init () {
+    _renderSubsystems();
+    _renderNodes();
+    _renderKPIs();
+    document.getElementById('db-model-name').textContent  = CONFIG.model.id;
+    document.getElementById('db-max-tokens').textContent  = CONFIG.model.maxOutputTokens.toLocaleString() + ' tokens';
+    refreshLogs();
+    setInterval(() => {
+      _renderNodes();
+      _renderUptime();
+      if (document.getElementById('panel-dashboard').classList.contains('active')) {
+        refreshLogs();
+      }
+    }, 5000);
+    setInterval(_renderUptime, 1000);
+  }
+
+  return { init, registerQuery, refreshLogs };
+})();
+
+/* ══════════════════════════════════════════════════════════
+   SERVERS — CU-2: monitor salud y recursos cada 5s
+════════════════════════════════════════════════════════ */
+const Servers = (() => {
+
+  const _nodes = [
+    { id: 'sv-1', name: 'Servidor A', cpu: 42, ram: 58, gpu: 35, role: 'Procesamiento' },
+    { id: 'sv-2', name: 'Servidor B', cpu: 67, ram: 72, gpu: 81, role: 'Inferencia IA' },
+    { id: 'sv-3', name: 'Servidor C', cpu: 23, ram: 41, gpu: 19, role: 'Coordinacion de carga' },
+  ];
+
+  let _alertHistory = [];
+  let _interval     = null;
+
+  function _fluctuate (val, min, max, delta) {
+    const next = val + (Math.random() - 0.5) * delta;
+    return Math.max(min, Math.min(max, Math.round(next)));
+  }
+
+  function _metricColor (pct) {
+    if (pct >= 90) return 'var(--danger)';
+    if (pct >= 70) return 'var(--warning)';
+    return 'var(--success)';
+  }
+
+  function _metricRow (label, pct) {
+    return `
+      <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:4px;">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);">
+          <span>${label}</span>
+          <span class="font-mono" style="color:${_metricColor(pct)};font-weight:700;">${pct}%</span>
+        </div>
+        <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:${_metricColor(pct)};border-radius:3px;transition:width 0.8s ease;"></div>
+        </div>
+      </div>
+    `;
+  }
+
+  function _render () {
+    let anyAlert = false;
+
+    // Fluctuar
+    _nodes.forEach(n => {
+      n.cpu = _fluctuate(n.cpu, 5, 98, 10);
+      n.ram = _fluctuate(n.ram, 20, 95, 7);
+      n.gpu = _fluctuate(n.gpu, 5, 98, 12);
+
+      const isAlert = n.cpu >= 90 || n.ram >= 90 || n.gpu >= 90;
+      if (isAlert) {
+        anyAlert = true;
+        const metrics = [];
+        if (n.cpu >= 90) metrics.push(`CPU ${n.cpu}%`);
+        if (n.ram >= 90) metrics.push(`RAM ${n.ram}%`);
+        if (n.gpu >= 90) metrics.push(`GPU ${n.gpu}%`);
+        const msg = `${n.name}: sobrecarga — ${metrics.join(', ')}`;
+        // Registrar en bitácora (solo si es nuevo en los últimos 30s)
+        const last = _alertHistory.find(a => a.node === n.id);
+        if (!last || Date.now() - last.ts > 30000) {
+          Auth.addLog('WARN', msg);
+          _alertHistory = _alertHistory.filter(a => a.node !== n.id);
+          _alertHistory.push({ node: n.id, ts: Date.now(), msg });
+        }
+      }
+    });
+
+    // Banner global
+    const banner = document.getElementById('servers-alert-banner');
+    if (anyAlert) {
+      banner.classList.add('visible');
+      const alertNodes = _nodes.filter(n => n.cpu >= 90 || n.ram >= 90 || n.gpu >= 90).map(n => n.name).join(', ');
+      document.getElementById('servers-alert-msg').textContent = `⚠ Alerta: ${alertNodes} supera el 90% de capacidad.`;
+    } else {
+      banner.classList.remove('visible');
+    }
+
+    // Timestamp
+    const now = new Date().toLocaleTimeString('es', { hour12: false });
+    document.getElementById('servers-last-update').textContent = `Ultima actualizacion: ${now}`;
+
+    // Tarjetas de nodos
+    const grid = document.getElementById('servers-grid');
+    if (!grid) return;
+    grid.innerHTML = _nodes.map(n => {
+      const isAlert = n.cpu >= 90 || n.ram >= 90 || n.gpu >= 90;
+      return `
+        <div class="server-card ${isAlert ? 'alert' : ''}">
+          <div class="server-card-header">
+            <div>
+              <div class="server-card-name">${n.name}</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${n.role}</div>
+            </div>
+            <div class="server-alert-badge">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+              Alerta
+            </div>
+          </div>
+          ${_metricRow('CPU', n.cpu)}
+          ${_metricRow('RAM', n.ram)}
+          ${_metricRow('GPU', n.gpu)}
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);border-top:1px solid var(--border);padding-top:8px;margin-top:4px;">
+            <span>Estado</span>
+            <span style="color:${isAlert ? 'var(--danger)' : 'var(--success)'};font-weight:600;">${isAlert ? 'Sobrecarga' : 'Operativo'}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Log de alertas
+    _renderAlertLog();
+  }
+
+  async function _renderAlertLog () {
+    const container = document.getElementById('servers-alert-log');
+    const countEl   = document.getElementById('servers-alert-count');
+    if (!container) return;
+
+    // Tomar los WARN de la bitácora
+    const logs = (await Auth.getLogs()).filter(l => l.level === 'WARN').slice(0, 20);
+    const countEl2 = document.getElementById('servers-alert-count');
+
+    if (!logs.length) {
+      countEl2.textContent = 'Sin alertas';
+      container.innerHTML = '<div style="padding:14px;color:var(--text-muted);font-size:12px;">No se han registrado alertas de infraestructura.</div>';
+      return;
+    }
+
+    countEl2.textContent = `${logs.length} alerta(s)`;
+    container.innerHTML = logs.map(l => {
+      const t = new Date(l.ts).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+      return `
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--border);font-size:11px;">
+          <span style="color:var(--text-muted);font-family:var(--font-mono);flex-shrink:0;min-width:52px;">${t}</span>
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--warning);flex-shrink:0;"></span>
+          <span style="color:var(--text-secondary);flex:1;">${l.msg}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function init () {
+    _render();
+    _interval = setInterval(_render, 5000);
+  }
+
+  return { init };
+})();
+
+/* ══════════════════════════════════════════════════════════
+   CHAT — CU-1: ingresar consultas y parametros
+════════════════════════════════════════════════════════ */
+const Chat = (() => {
+
+  let _history     = [];
+  let _attachments = []; // { base64, mime, preview|null, name, kind:'image'|'document' }
+  let _sending     = false;
+  let _queryCount  = 0;
+  let _imgCount    = 0;
+  let _fbCount     = 0;
+
+  const steps = ['ps-input', 'ps-proc', 'ps-conn', 'ps-model', 'ps-store', 'ps-post', 'ps-out'];
+
+  function _pipelineReset () {
+    steps.forEach(id => {
+      const el = document.getElementById(id);
+      el.classList.remove('active', 'done', 'error');
+    });
+  }
+
+  function _pipelineSet (idx, state) {
+    const el = document.getElementById(steps[idx]);
+    el.classList.remove('active', 'done', 'error');
+    el.classList.add(state);
+  }
+
+  function _delay (ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  async function _updateStats () {
+    document.getElementById('stat-queries').textContent   = _queryCount;
+    document.getElementById('stat-images').textContent    = _imgCount;
+    document.getElementById('stat-feedbacks').textContent = _fbCount;
+    document.getElementById('stat-history').textContent   = _history.length + ' msgs';
+
+    // Almacenamiento — Base de datos de resultados (conteo real desde localStorage cifrado)
+    const raw    = localStorage.getItem(CONFIG.keys.history);
+    const stored = (await Crypto.decrypt(raw)) || [];
+    const storedEl = document.getElementById('stat-stored-results');
+    if (storedEl) storedEl.textContent = stored.length;
+
+    // Caché de modelo — versión activa
+    const cacheEl = document.getElementById('stat-cache-version');
+    if (cacheEl) cacheEl.textContent = CONFIG.model.id;
+  }
+
+  function incrementFeedback () { _fbCount++; _updateStats(); }
+
+  function _scrollBottom () {
+    const c = document.getElementById('chat-messages');
+    c.scrollTop = c.scrollHeight;
+  }
+
+  function _ts () {
+    return new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  /* ── Postprocesamiento — RQF-15 / RQF-16 ────────────────────
+     Toma la respuesta cruda del modelo y la estructura en un
+     formato presentable: negritas, listas, bloques de código
+     y tablas simples. Esto es el "Formateador de resultados"
+     + "Generador de reportes" del documento, aplicado a texto. */
+  function _postprocess (raw) {
+    let html = _escapeHtml(raw);
+
+    // Bloques de código ```...```
+    html = html.replace(/```([\s\S]*?)```/g, (_, code) =>
+      `<pre style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:10px 12px;overflow-x:auto;margin:8px 0;font-family:var(--font-mono);font-size:12px;white-space:pre-wrap;">${code.trim()}</pre>`
+    );
+    // Negritas **texto**
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    // Código inline `texto`
+    html = html.replace(/`([^`]+?)`/g, '<code style="background:var(--bg-elevated);padding:1px 5px;border-radius:4px;font-family:var(--font-mono);font-size:12px;">$1</code>');
+    // Listas con viñetas: líneas que empiezan con "- " o "* "
+    html = html.replace(/(?:<br>|^)([\-\*] .+(?:<br>[\-\*] .+)*)/g, (match) => {
+      const items = match.replace(/^<br>/, '').split('<br>').map(l => l.replace(/^[\-\*]\s+/, ''));
+      return '<ul style="margin:6px 0;padding-left:18px;">' + items.map(i => `<li style="margin:2px 0;">${i}</li>`).join('') + '</ul>';
+    });
+    return html;
+  }
+
+  function _escapeHtml (str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\n/g, '<br>');
+  }
+
+  function _addMessage (role, text, imageDataURLs = [], isFinal = false, docChips = [], isHTML = false) {
+    const empty = document.getElementById('chat-empty');
+    if (empty) empty.remove();
+
+    const container = document.getElementById('chat-messages');
+    const isUser    = role === 'user';
+    const avatarText = isUser ? (Auth.currentUser()?.initials || 'U') : 'IA';
+
+    const imgsHTML = imageDataURLs.map(src =>
+      `<img src="${src}" alt="imagen adjunta" style="max-width:220px;border-radius:8px;margin-top:6px;display:block;">`
+    ).join('');
+
+    const docsHTML = docChips.map(d => `
+      <div style="display:flex;align-items:center;gap:8px;margin-top:6px;padding:8px 10px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;max-width:220px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary);flex-shrink:0;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span style="font-size:11px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${d.name}</span>
+      </div>
+    `).join('');
+
+    // Barra de retroalimentacion solo en respuestas del asistente finales (CU-5)
+    const feedbackBar = (!isUser && isFinal) ? `
+      <div class="feedback-bar" id="fb-bar-${Date.now()}">
+        <button class="feedback-btn" onclick="Feedback.open(this)" title="Enviar retroalimentacion">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Retroalimentacion
+        </button>
+      </div>
+    ` : '';
+
+    // Indicador de Postprocesamiento — visible solo en respuestas formateadas del modelo
+    const postBadge = (!isUser && isHTML) ? `
+      <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.03em;">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+        Postprocesado
+      </div>
+    ` : '';
+
+    const div = document.createElement('div');
+    div.className = `message ${role}`;
+    div.innerHTML = `
+      <div class="message-avatar">${avatarText}</div>
+      <div class="message-content">
+        <div class="message-bubble">${postBadge}${imgsHTML}${docsHTML}${isHTML ? text : _escapeHtml(text)}</div>
+        <div class="message-time">${_ts()}</div>
+        ${feedbackBar}
+      </div>
+    `;
+
+    container.appendChild(div);
+    _scrollBottom();
+    return div;
+  }
+
+  function _showTyping () {
+    const empty = document.getElementById('chat-empty');
+    if (empty) empty.remove();
+    const container = document.getElementById('chat-messages');
+    const div = document.createElement('div');
+    div.className = 'message assistant';
+    div.id = 'typing-msg';
+    div.innerHTML = `
+      <div class="message-avatar">IA</div>
+      <div class="message-content">
+        <div class="typing-indicator">
+          <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+        </div>
+      </div>
+    `;
+    container.appendChild(div);
+    _scrollBottom();
+  }
+
+  function _removeTyping () {
+    const el = document.getElementById('typing-msg');
+    if (el) el.remove();
+  }
+
+  function _fileToBase64 (file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload  = e => resolve(e.target.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  const IMAGE_TYPES = ['image/png','image/jpeg','image/webp','image/heic','image/heif'];
+  const DOC_TYPES   = ['application/pdf','text/plain','text/csv'];
+  const DOC_EXT_FALLBACK = ['.pdf','.txt','.csv']; // algunos navegadores no rellenan file.type para .txt/.csv
+  const MAX_SIZE_MB   = 7;
+  const MAX_ATTACH    = 5;
+
+  function _extOf (name) {
+    const i = name.lastIndexOf('.');
+    return i === -1 ? '' : name.slice(i).toLowerCase();
+  }
+
+  /* ── Adjuntar archivos (imagen o documento) — CU-1 / RQF-02 ──
+     Valida formato y tamaño antes de aceptar el archivo.
+     Si no cumple, el sistema NO lo agrega y notifica el error
+     (flujo alternativo 3A: "no procesará hasta que se corrija"). */
+  function attachImages (files) {
+    Array.from(files).forEach(async (file) => {
+      const isImage = IMAGE_TYPES.includes(file.type);
+      const isDoc   = DOC_TYPES.includes(file.type) || DOC_EXT_FALLBACK.includes(_extOf(file.name));
+
+      if (!isImage && !isDoc) {
+        Auth.addLog('WARN', `Archivo rechazado (formato no soportado): ${file.name} — ${file.type || 'desconocido'}`);
+        _addMessage('assistant', `Formato no soportado: "${file.name}".\nFormatos validos: PNG, JPEG, WEBP, HEIC, HEIF (imagen) o PDF, TXT, CSV (documento).`, [], true);
+        return;
+      }
+      if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+        Auth.addLog('WARN', `Archivo rechazado (excede tamano maximo): ${file.name} — ${(file.size/1024/1024).toFixed(1)}MB`);
+        _addMessage('assistant', `El archivo "${file.name}" supera el limite de ${MAX_SIZE_MB}MB (${(file.size/1024/1024).toFixed(1)}MB).`, [], true);
+        return;
+      }
+      if (_attachments.length >= MAX_ATTACH) {
+        _addMessage('assistant', `Limite de ${MAX_ATTACH} adjuntos por consulta alcanzado.`, [], true);
+        return;
+      }
+
+      const dataURL = await _fileToBase64(file);
+      const mime    = file.type || (isDoc ? 'text/plain' : 'application/octet-stream');
+
+      _attachments.push({
+        base64:  dataURL.split(',')[1],
+        mime,
+        preview: isImage ? dataURL : null,
+        name:    file.name,
+        size:    file.size,
+        kind:    isImage ? 'image' : 'document',
+      });
+      _renderAttachPreview();
+    });
+  }
+
+  function _docIconSVG () {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+  }
+
+  function _renderAttachPreview () {
+    const container = document.getElementById('image-preview');
+    container.innerHTML = '';
+    _attachments.forEach((att, idx) => {
+      const wrap = document.createElement('div');
+      if (att.kind === 'image') {
+        wrap.className = 'chat-image-thumb';
+        wrap.innerHTML = `
+          <img src="${att.preview}" alt="preview">
+          <button class="chat-image-remove" onclick="Chat.removeImage(${idx})" title="Eliminar">✕</button>
+        `;
+      } else {
+        wrap.className = 'chat-doc-chip';
+        const ext = _extOf(att.name).replace('.', '').toUpperCase() || 'DOC';
+        wrap.innerHTML = `
+          ${_docIconSVG()}
+          <div class="chat-doc-chip-info">
+            <span class="chat-doc-chip-name" title="${att.name}">${att.name}</span>
+            <span class="chat-doc-chip-meta">${ext} · ${(att.size/1024).toFixed(0)} KB</span>
+          </div>
+          <button class="chat-image-remove" onclick="Chat.removeImage(${idx})" title="Eliminar">✕</button>
+        `;
+      }
+      container.appendChild(wrap);
+    });
+  }
+
+  function removeImage (idx) {
+    _attachments.splice(idx, 1);
+    _renderAttachPreview();
+  }
+
+  function toggleAttachMenu (evt, forceClose) {
+    if (evt) evt.stopPropagation();
+    const menu = document.getElementById('attach-menu');
+    if (forceClose) { menu.classList.remove('visible'); return; }
+    menu.classList.toggle('visible');
+  }
+  document.addEventListener('click', (e) => {
+    const menu = document.getElementById('attach-menu');
+    const btn  = document.getElementById('attach-btn');
+    if (menu && menu.classList.contains('visible') && !menu.contains(e.target) && e.target !== btn) {
+      menu.classList.remove('visible');
+    }
+  });
+
+  /* ── Llamada al modelo — envía TEXTO + IMÁGENES + DOCUMENTOS ──
+     Núcleo del Modelo IA / MML: cualquier adjunto (imagen o
+     documento) viaja como inlineData al motor de inferencia. */
+  async function _callGemini (userText, attachmentsToSend) {
+    const apiKey = CONFIG.model.apiKey;
+    const parts  = [];
+
+    attachmentsToSend.forEach(att => {
+      parts.push({ inlineData: { mimeType: att.mime, data: att.base64 } });
+    });
+    if (userText) parts.push({ text: userText });
+
+    _history.push({ role: 'user', parts });
+
+    const body = {
+      system_instruction: { parts: [{ text: CONFIG.model.systemPrompt }] },
+      contents: _history,
+      generationConfig: { maxOutputTokens: CONFIG.model.maxOutputTokens },
+    };
+
+    const targetUrl = `${CONFIG.model.endpoint}?key=${apiKey}`;
+
+    // Restriccion de red (RQNF-14): solo dominios en whitelist
+    if (!CONFIG.isAllowedDomain(targetUrl)) {
+      Auth.addLog('ERROR', `Conexion bloqueada: dominio fuera de whitelist (${targetUrl})`);
+      throw new Error('Conexion bloqueada: el dominio de destino no esta autorizado (RQNF-14).');
+    }
+
+    const res = await fetch(targetUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData?.error?.message || `HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    const responseText = data?.candidates?.[0]?.content?.parts
+      ?.filter(p => p.text)?.map(p => p.text)?.join('') || '(Sin respuesta del modelo)';
+
+    _history.push({ role: 'model', parts: [{ text: responseText }] });
+    return responseText;
+  }
+
+  /* ── Guardar consulta + respuesta — poscondición CU-1 ───
+     Persistido cifrado (AES-256-GCM) — RQF-07 / RQNF-05 */
+  async function _saveResult (query, response, attachments) {
+    const raw = localStorage.getItem(CONFIG.keys.history);
+    const stored = (await Crypto.decrypt(raw)) || [];
+    stored.unshift({
+      ts:        new Date().toISOString(),
+      user:      Auth.currentUser()?.username || 'sistema',
+      query:     query || (attachments.length ? `[Solo adjunto(s): ${attachments.map(a => a.name || 'imagen').join(', ')}]` : '(vacío)'),
+      response,
+      attachments: attachments.map(a => ({ name: a.name || 'imagen', kind: a.kind })),
+    });
+    if (stored.length > 200) stored.length = 200;
+    localStorage.setItem(CONFIG.keys.history, await Crypto.encrypt(stored));
+  }
+
+    /* ── Validar y enviar — CU-1 ──────────────────────────── */
+  async function send () {
+    if (_sending) return;
+
+    const textarea = document.getElementById('chat-input');
+    const validMsg = document.getElementById('chat-validation-msg');
+    const text     = textarea.value.trim();
+    const attCopy  = [..._attachments];
+
+    // CU-1 — Flujo alternativo 3A: validar integridad/completitud
+    if (!text && attCopy.length === 0) {
+      Auth.addLog('WARN', 'Consulta rechazada: campos incompletos (sin texto ni adjuntos)');
+      textarea.classList.add('input-error');
+      validMsg.classList.add('visible');
+      setTimeout(() => {
+        textarea.classList.remove('input-error');
+        validMsg.classList.remove('visible');
+      }, 2500);
+      return;
+    }
+
+    validMsg.classList.remove('visible');
+    _sending = true;
+    document.getElementById('send-btn').disabled   = true;
+    document.getElementById('attach-btn').disabled = true;
+
+    const previewURLs = attCopy.filter(a => a.kind === 'image').map(a => a.preview);
+    const docChips     = attCopy.filter(a => a.kind === 'document');
+    _addMessage('user', text, previewURLs, false, docChips);
+
+    textarea.value = '';
+    textarea.style.height = '';
+    _attachments = [];
+    _renderAttachPreview();
+    document.getElementById('token-hint').textContent = '';
+
+    _showTyping();
+    _pipelineReset();
+    _pipelineSet(0, 'active'); // 0: Fuente de Datos
+
+    _queryCount++;
+    if (attCopy.length > 0) _imgCount += attCopy.filter(a => a.kind === 'image').length;
+    _updateStats();
+
+    Auth.addLog('INFO', `Consulta enviada al modelo${attCopy.length ? ` (${attCopy.length} adjunto/s)` : ''}`);
+    Dashboard.registerQuery(attCopy.length > 0, attCopy.length);
+
+    try {
+      // 0 → 1: Procesamiento (validación ya ejecutada al adjuntar/escribir)
+      await _delay(150);
+      _pipelineSet(0, 'done');
+      _pipelineSet(1, 'active');
+      await _delay(200);
+      Auth.addLog('INFO', 'Procesamiento: datos validados y normalizados (RQF-02/03)');
+      _pipelineSet(1, 'done');
+
+      // 2: Conexión de Datos — canaliza la solicitud hacia el modelo (RQF-05)
+      _pipelineSet(2, 'active');
+      await _delay(120);
+      Auth.addLog('INFO', 'Conexión de Datos: canal establecido hacia el Modelo IA/MML');
+      _pipelineSet(2, 'done');
+
+      // 3: Modelo IA / MML — inferencia real
+      _pipelineSet(3, 'active');
+      const rawResponse = await _callGemini(text, attCopy);
+      _pipelineSet(3, 'done');
+
+      // 4: Almacenamiento — guarda resultado + actualiza caché de modelo (poscondición CU-1)
+      _pipelineSet(4, 'active');
+      await _saveResult(text, rawResponse, attCopy);
+      await _delay(100);
+      _pipelineSet(4, 'done');
+
+      // 5: Postprocesamiento — formatea la salida cruda a presentación (RQF-15/16)
+      _pipelineSet(5, 'active');
+      const formattedResponse = _postprocess(rawResponse);
+      await _delay(100);
+      _pipelineSet(5, 'done');
+
+      // 6: Interfaz / UI — despliega el resultado final
+      _pipelineSet(6, 'active');
+      _removeTyping();
+      _addMessage('assistant', formattedResponse, [], true, [], true); // isFinal=true → CU-5 | isHTML=true → postprocesado
+      await _delay(80);
+      _pipelineSet(6, 'done');
+
+      Auth.addLog('INFO', 'Respuesta recibida del modelo y presentada en Interfaz/UI');
+
+    } catch (err) {
+      _pipelineSet(3, 'error');
+      _pipelineSet(6, 'active');
+      await _delay(100);
+      _pipelineSet(6, 'error');
+
+      _removeTyping();
+      _addMessage('assistant', `Error al contactar el modelo:\n${err.message}`, [], false);
+
+      if (_history.length && _history[_history.length - 1].role === 'user') {
+        _history.pop();
+      }
+      Auth.addLog('ERROR', `Fallo en modelo: ${err.message}`);
+    }
+
+    _updateStats();
+    _sending = false;
+    document.getElementById('send-btn').disabled   = false;
+    document.getElementById('attach-btn').disabled = false;
+    textarea.focus();
+  }
+
+  function clearHistory () {
+    _history = []; _queryCount = 0; _imgCount = 0; _fbCount = 0; _attachments = [];
+    _renderAttachPreview();
+    _pipelineReset();
+    _updateStats();
+    document.getElementById('chat-messages').innerHTML = `
+      <div class="chat-empty" id="chat-empty">
+        <div class="chat-empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted)">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+          </svg>
+        </div>
+        <div style="font-size:13px;font-weight:600;color:var(--text-secondary);">Modelo IA / MML listo</div>
+        <div style="font-size:12px;max-width:280px;color:var(--text-muted);">Ingrese una consulta de texto, o adjunte una imagen o documento (PDF, TXT, CSV) para comenzar el analisis multimodal.</div>
+      </div>
+    `;
+    Auth.addLog('INFO', 'Historial de chat limpiado');
+  }
+
+  _updateStats(); // muestra el estado inicial de Almacenamiento/Caché al cargar
+
+  return { send, attachImages, removeImage, clearHistory, incrementFeedback, toggleAttachMenu };
+})();
+
+/* ── Event listeners del chat ───────────────────────────── */
+const chatInput      = document.getElementById('chat-input');
+const sendBtn        = document.getElementById('send-btn');
+const fileInputImage = document.getElementById('file-input-image');
+const fileInputDoc   = document.getElementById('file-input-doc');
+
+chatInput.addEventListener('input', () => {
+  chatInput.style.height = 'auto';
+  chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+  const len = chatInput.value.length;
+  document.getElementById('token-hint').textContent = len > 50 ? `~${len} caracteres` : '';
+});
+
+chatInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); Chat.send(); }
+});
+
+sendBtn.addEventListener('click', () => Chat.send());
+fileInputImage.addEventListener('change', (e) => { Chat.attachImages(e.target.files); fileInputImage.value = ''; });
+fileInputDoc.addEventListener('change',   (e) => { Chat.attachImages(e.target.files); fileInputDoc.value   = ''; });
+
+const chatMessages = document.getElementById('chat-messages');
+chatMessages.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  chatMessages.style.outline = '2px dashed var(--primary)';
+});
+chatMessages.addEventListener('dragleave', () => { chatMessages.style.outline = ''; });
+chatMessages.addEventListener('drop', (e) => {
+  e.preventDefault();
+  chatMessages.style.outline = '';
+  if (e.dataTransfer.files.length) Chat.attachImages(e.dataTransfer.files);
+});
+
+/* ══════════════════════════════════════════════════════════
+   FEEDBACK — CU-5: retroalimentacion del sistema
+════════════════════════════════════════════════════════ */
+const Feedback = (() => {
+
+  let _star      = 0;
+  let _btnRef    = null;
+
+  // Retroalimentaciones cifradas en reposo (AES-256-GCM) — RQF-07 / RQNF-05
+  async function _getAll () {
+    const raw = localStorage.getItem(CONFIG.keys.results);
+    return (await Crypto.decrypt(raw)) || [];
+  }
+
+  function open (btn) {
+    _btnRef = btn;
+    _star   = 0;
+    document.getElementById('feedback-comment').value = '';
+    document.getElementById('feedback-reprocess').checked = false;
+    // Reset estrellas
+    document.querySelectorAll('.star-btn').forEach(s => s.classList.remove('lit'));
+    document.getElementById('feedback-overlay').classList.remove('hidden');
+  }
+
+  function close () {
+    document.getElementById('feedback-overlay').classList.add('hidden');
+  }
+
+  function setStar (n) {
+    _star = n;
+    document.querySelectorAll('.star-btn').forEach(s => {
+      s.classList.toggle('lit', parseInt(s.dataset.star) <= n);
+    });
+  }
+
+  async function save () {
+    const comment    = document.getElementById('feedback-comment').value.trim();
+    const reprocess  = document.getElementById('feedback-reprocess').checked;
+
+    // Guardar cifrado (poscondicion CU-5) — RQF-07 / RQNF-05
+    const entry = {
+      ts:        new Date().toISOString(),
+      user:      Auth.currentUser()?.username || 'sistema',
+      stars:     _star,
+      comment,
+      reprocess,
+    };
+    const all = await _getAll();
+    all.unshift(entry);
+    if (all.length > 500) all.length = 500;
+    localStorage.setItem(CONFIG.keys.results, await Crypto.encrypt(all));
+
+    Auth.addLog('INFO', `Retroalimentacion guardada (${_star} estrellas)${reprocess ? ' — solicita reprocesamiento' : ''}`);
+
+    // Marcar el boton como enviado
+    if (_btnRef) {
+      _btnRef.classList.add('active');
+      _btnRef.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Enviada
+      `;
+      _btnRef.disabled = true;
+    }
+
+    Chat.incrementFeedback();
+    close();
+
+    // Flujo alternativo 3A — reprocesamiento
+    if (reprocess && comment) {
+      setTimeout(() => {
+        const textarea = document.getElementById('chat-input');
+        textarea.value = `[Reprocesamiento solicitado] ${comment}`;
+        textarea.dispatchEvent(new Event('input'));
+        UI.goTo('model');
+        Auth.addLog('INFO', 'Reprocesamiento enviado desde retroalimentacion');
+      }, 400);
+    }
+  }
+
+  return { open, close, setStar, save };
+})();
+
+/* ══════════════════════════════════════════════════════════
+   TRAINING — CU-4: entrenar y actualizar modelo IA
+════════════════════════════════════════════════════════ */
+const Training = (() => {
+
+  let _running    = false;
+  let _cache      = [];
+
+  function _log (msg, type = '') {
+    const container = document.getElementById('training-log');
+    const line = document.createElement('div');
+    line.className = `training-log-line ${type}`;
+    const ts = new Date().toLocaleTimeString('es', { hour12: false });
+    line.textContent = `[${ts}] ${msg}`;
+    container.appendChild(line);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function _setAccuracy (pct) {
+    const el    = document.getElementById('accuracy-value');
+    const label = document.getElementById('accuracy-label');
+    const msg   = document.getElementById('accuracy-result-msg');
+    el.textContent = pct !== null ? `${pct}%` : '—';
+    el.className   = 'accuracy-value';
+    msg.style.display = 'none';
+
+    if (pct === null) {
+      label.textContent = 'Sin entrenamiento';
+    } else if (pct >= 90) {
+      el.classList.add('pass');
+      label.textContent     = 'Precision aprobada ✓';
+      msg.style.display     = 'block';
+      msg.style.color       = 'var(--success)';
+      msg.textContent       = `El modelo alcanzo ${pct}% de precision. Version guardada en cache.`;
+    } else {
+      el.classList.add('fail');
+      label.textContent     = 'Precision insuficiente ✗';
+      msg.style.display     = 'block';
+      msg.style.color       = 'var(--danger)';
+      msg.textContent       = `El modelo solo alcanzo ${pct}%. No supera el umbral del 90% — actualizacion descartada. (RQNF-08)`;
+    }
+  }
+
+  function _updateProgress (epoch, total) {
+    const pct = Math.round((epoch / total) * 100);
+    document.getElementById('training-progress-fill').style.width = pct + '%';
+    document.getElementById('training-pct').textContent = pct + '%';
+    document.getElementById('training-epoch-counter').textContent = `Epoca ${epoch} / ${total}`;
+  }
+
+  async function start () {
+    if (_running) return;
+
+    // Validar formulario
+    const dataset   = document.getElementById('training-dataset').value;
+    const epochs    = parseInt(document.getElementById('training-epochs').value);
+    const lr        = parseFloat(document.getElementById('training-lr').value);
+    const threshold = parseInt(document.getElementById('training-threshold').value);
+    const validMsg  = document.getElementById('training-validation-msg');
+
+    validMsg.style.display = 'none';
+
+    if (!dataset) {
+      validMsg.textContent = 'Seleccione un conjunto de datos antes de iniciar.';
+      validMsg.style.display = 'block';
+      return;
+    }
+    if (!epochs || epochs < 1) {
+      validMsg.textContent = 'El numero de epocas debe ser mayor a 0.';
+      validMsg.style.display = 'block';
+      return;
+    }
+
+    _running = true;
+
+    // UI: mostrar progreso, deshabilitar form
+    document.getElementById('training-progress-card').style.display = '';
+    document.getElementById('training-start-btn').disabled  = true;
+    document.getElementById('training-reset-btn').style.display = '';
+    document.getElementById('training-reset-btn').disabled  = true;
+
+    const badge = document.getElementById('training-status-badge');
+    badge.textContent = 'Entrenando...';
+    badge.style.background = 'var(--primary-dim)';
+    badge.style.color      = 'var(--primary)';
+    badge.style.border     = '1px solid var(--primary)';
+
+    document.getElementById('training-log').innerHTML = '';
+    _setAccuracy(null);
+    _updateProgress(0, epochs);
+
+    Auth.addLog('INFO', `Entrenamiento iniciado: dataset=${dataset}, epocas=${epochs}, lr=${lr}`);
+    _log(`Iniciando entrenamiento — dataset: ${dataset}`);
+    _log(`Parametros: ${epochs} epocas, LR=${lr}, umbral=${threshold}%`);
+
+    // Simular epocas
+    let finalAccuracy = 0;
+    for (let e = 1; e <= epochs; e++) {
+      await new Promise(r => setTimeout(r, 300 + Math.random() * 200));
+      _updateProgress(e, epochs);
+
+      // Simular loss decreciente y accuracy creciente
+      const loss     = parseFloat((2.5 * Math.exp(-0.3 * e) + Math.random() * 0.1).toFixed(4));
+      const accuracy = Math.min(98, Math.round(40 + (e / epochs) * 55 + Math.random() * 5));
+      finalAccuracy  = accuracy;
+
+      const type = accuracy >= threshold ? 'ok' : '';
+      _log(`Epoca ${e}/${epochs} — loss: ${loss}  accuracy: ${accuracy}%`, type);
+    }
+
+    // Validacion de calidad (RQNF-08)
+    _setAccuracy(finalAccuracy);
+    _updateProgress(epochs, epochs);
+
+    if (finalAccuracy >= threshold) {
+      // Guardar en cache (poscondicion CU-4)
+      const version = {
+        id:       `v${_cache.length + 1}.0.0`,
+        dataset,
+        accuracy: finalAccuracy,
+        epochs,
+        ts:       new Date().toISOString(),
+        active:   _cache.length === 0,
+      };
+      _cache.push(version);
+      _renderCache();
+
+      badge.textContent = 'Completado ✓';
+      badge.style.background = 'var(--success-dim)';
+      badge.style.color      = 'var(--success)';
+      badge.style.border     = '1px solid var(--success)';
+
+      _log(`Entrenamiento completado. Version ${version.id} guardada en cache.`, 'ok');
+      Auth.addLog('INFO', `Modelo entrenado: accuracy=${finalAccuracy}%, version=${version.id}`);
+    } else {
+      badge.textContent = 'Rechazado ✗';
+      badge.style.background = 'var(--danger-dim)';
+      badge.style.color      = 'var(--danger)';
+      badge.style.border     = '1px solid var(--danger)';
+
+      _log(`Actualizacion DESCARTADA. Precision ${finalAccuracy}% < umbral ${threshold}%.`, 'err');
+      Auth.addLog('WARN', `Entrenamiento rechazado: accuracy=${finalAccuracy}% < umbral=${threshold}%`);
+    }
+
+    _running = false;
+    document.getElementById('training-reset-btn').disabled = false;
+  }
+
+  function reset () {
+    if (_running) return;
+    document.getElementById('training-progress-card').style.display = 'none';
+    document.getElementById('training-start-btn').disabled   = false;
+    document.getElementById('training-reset-btn').style.display = 'none';
+    document.getElementById('training-log').innerHTML         = '';
+    document.getElementById('training-pct').textContent       = '0%';
+    document.getElementById('training-progress-fill').style.width = '0%';
+    document.getElementById('training-epoch-counter').textContent = 'Epoca 0 / 0';
+    document.getElementById('training-validation-msg').style.display = 'none';
+
+    const badge = document.getElementById('training-status-badge');
+    badge.textContent = 'Listo';
+    badge.style.background = 'var(--bg-elevated)';
+    badge.style.color      = 'var(--text-muted)';
+    badge.style.border     = '1px solid var(--border)';
+
+    _setAccuracy(null);
+  }
+
+  function _renderCache () {
+    const container = document.getElementById('cache-list');
+    const countEl   = document.getElementById('cache-count');
+    countEl.textContent = `${_cache.length} version(es)`;
+    if (!_cache.length) {
+      container.innerHTML = '<div style="font-size:12px;color:var(--text-muted);">No hay versiones entrenadas almacenadas.</div>';
+      return;
+    }
+    container.innerHTML = [..._cache].reverse().map(v => {
+      const ts = new Date(v.ts).toLocaleString('es', { hour12: false });
+      return `
+        <div class="cache-item">
+          <div>
+            <div class="cache-item-name">${v.id}</div>
+            <div class="cache-item-meta">${ts} · DS: ${v.dataset}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+            <span class="cache-item-badge" style="background:var(--success-dim);color:var(--success);">${v.accuracy}%</span>
+            ${v.active ? '<span class="cache-item-badge" style="background:var(--primary-dim);color:var(--primary);">activo</span>' : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  return { start, reset };
+})();
+
+/* ══════════════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════════════ */
+Auth.addLog('INFO', 'Dashboard cargado');
+Dashboard.init();
+Servers.init();
+
+/* ── Setear nombre del modelo desde CONFIG (unificado) ── */
+const _modelId = CONFIG.model.id;
+const _elTopbar = document.getElementById('topbar-model-id');
+if (_elTopbar) _elTopbar.textContent = _modelId;
+const _elDbModel = document.getElementById('db-model-name');
+if (_elDbModel) _elDbModel.textContent = _modelId;
+
+</script>
+
+<!-- Estilos de select para el formulario de entrenamiento -->
+<style>
+  .form-select-styled {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    padding: 9px 32px 9px 12px;
+    font-size: 13px;
+    outline: none;
+    width: 100%;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b93b0' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    cursor: pointer;
+    transition: border-color var(--transition), box-shadow var(--transition);
+  }
+  .form-select-styled:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-dim);
+  }
+  .form-select-styled option {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+  }
+</style>
+
+</body>
+</html>
