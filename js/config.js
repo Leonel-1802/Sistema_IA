@@ -9,7 +9,7 @@ const CONFIG = {
 
   /* ── Modelo de IA (Google Gemini) ─────────────────────── */
   model: {
-    id:      'gemini-3.5-flash',
+    id:      'gemini-2.0-flash',
     baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
     apiKey:  'AQ.Ab8RN6IrD756pYqPu36ZfCLtjTzyICxkWbkLcqNvdijHUVAdyA',
     get endpoint() {
@@ -17,11 +17,10 @@ const CONFIG = {
     },
     maxOutputTokens: 2048,
     temperature:     0.7,
-    systemPrompt: `Eres el núcleo de inferencia de un Modelo IA / MML (Multimodal Machine Learning) integrado en un sistema empresarial.
-Tu función es procesar consultas de texto, imágenes y documentos (PDF, TXT, CSV), generar análisis, predicciones y respuestas precisas.
+    systemPrompt: `Eres un asistente de inteligencia artificial multimodal de alto rendimiento integrado en un sistema LMM empresarial.
+Tu función es procesar consultas de texto e imágenes, generar análisis, predicciones y respuestas precisas.
 Responde siempre de forma clara, estructurada y profesional.
 Cuando recibas imágenes, descríbelas y analízalas detalladamente.
-Cuando recibas documentos (PDF, TXT o CSV), extrae y analiza su contenido relevante antes de responder.
 Puedes responder en el idioma del usuario.`,
   },
 
