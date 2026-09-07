@@ -11,7 +11,7 @@ const CONFIG = {
   model: {
     id:      'gemini-2.0-flash',
     baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
-    apiKey:  'AQ.Ab8RN6IrD756pYqPu36ZfCLtjTzyICxkWbkLcqNvdijHUVAdyA',
+    apiKey:  'AQ.Ab8RN6Kiz0yyBH2VBIC1I6roWXk8caVglYRpt6mHQmOeVdmNkQ',
     get endpoint() {
       return `${this.baseUrl}/models/${this.id}:generateContent`;
     },
