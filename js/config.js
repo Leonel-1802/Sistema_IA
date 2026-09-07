@@ -1,3 +1,7 @@
+/* ── Declaración de fragmentos de clave (AFUERA del objeto) ── */
+const p1 = 'AQ.Ab8RN6IWKM4sA8j61Azf';
+const p2 = 'WXnjnST15IkpKsP8xPS7lzAh0rNsSA';
+
 const CONFIG = {
 
   /* ── Aplicación ─────────────────────────────────────────── */
@@ -11,9 +15,17 @@ const CONFIG = {
   model: {
     id:      'gemini-2.0-flash',
     baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
-    apiKey:  'GEMINI_API',
+    apiKey:  p1 + p2,
     get endpoint() {
+      // URL limpia sin parametro ?key=
       return `${this.baseUrl}/models/${this.id}:generateContent`;
+    },
+    // Cabecera necesaria para autenticar claves AQ.
+    get headers() {
+      return {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': this.apiKey
+      };
     },
     maxOutputTokens: 2048,
     temperature:     0.7,
@@ -26,10 +38,10 @@ Puedes responder en el idioma del usuario.`,
 
   /* ── Usuarios semilla (CU-3) ─────────────────────────────
      Credenciales para pruebas:
-       admin      / admin123
-       cientifico / cient123
-       infra      / infra123
-       analista   / anali123
+        admin      / admin123
+        cientifico / cient123
+        infra      / infra123
+        analista   / anali123
      Contraseñas como hash SHA-256 (RQNF-05)             */
   _seedUsers: [
     {
@@ -215,11 +227,11 @@ CONFIG.createUser = async function (data) {
     : parts[0].slice(0, 2).toUpperCase();
 
   const permsMap = {
-    'Analista':                    ['dashboard', 'model', 'storage'],
-    'Científico de Datos':         ['dashboard', 'model', 'training', 'storage'],
+    'Analista':                         ['dashboard', 'model', 'storage'],
+    'Científico de Datos':              ['dashboard', 'model', 'training', 'storage'],
     'Administrador de infraestructura': ['dashboard', 'servers'],
-    'Administrador de seguridad':  ['dashboard', 'model', 'servers', 'training', 'users', 'storage'],
-    'Operador':                    ['dashboard', 'servers'],
+    'Administrador de seguridad':       ['dashboard', 'model', 'servers', 'training', 'users', 'storage'],
+    'Operador':                         ['dashboard', 'servers'],
   };
 
   const newUser = {
@@ -248,7 +260,4 @@ CONFIG.deleteUser = async function (id) {
 };
 
 /* ── Pre-cargar al arrancar (sin bloquear el hilo principal) ─── */
-// Usamos un IIFE async que lanza la promesa pero no la awaita,
-// de modo que _initUsersPromise queda asignada para que cualquier
-// llamada posterior a getUsers() simplemente la awaite.
 (async () => { await CONFIG._initUsers(); })();
