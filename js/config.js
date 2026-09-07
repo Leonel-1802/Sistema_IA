@@ -12,15 +12,33 @@ const CONFIG = {
   },
 
   /* ── Modelo de IA (Google Gemini) ─────────────────────── */
+/* ── Declaración de fragmentos de clave ── */
+const p1 = 'AQ.Ab8RN6IWKM4sA8j61Azf';
+const p2 = 'WXnjnST15IkpKsP8xPS7lzAh0rNsSA';
+
+const CONFIG = {
+
+  /* ── Aplicación ─────────────────────────────────────────── */
+  app: {
+    name:    'Sistema de IA',
+    tagline: 'Multimodal Machine Learning Platform',
+    version: '1.0.0',
+  },
+
+  /* ── Modelo de IA (Google Gemini 3.5 / 3.6 Flash) ────────── */
   model: {
-    id:      'gemini-3.5-flash',
+    id:      'gemini-3.5-flash', // O 'gemini-3.6-flash'
     baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
     apiKey:  p1 + p2,
+    
     get endpoint() {
-      // URL limpia sin parametro ?key=
+      return `${this.baseUrl}/models/${this.id}:generateContent?key=${this.apiKey}`;
+    },
+    
+    get cleanEndpoint() {
       return `${this.baseUrl}/models/${this.id}:generateContent`;
     },
-    // Cabecera necesaria para autenticar claves AQ.
+
     get headers() {
       return {
         'Content-Type': 'application/json',
@@ -35,6 +53,8 @@ Responde siempre de forma clara, estructurada y profesional.
 Cuando recibas imágenes, descríbelas y analízalas detalladamente.
 Puedes responder en el idioma del usuario.`,
   },
+
+  /* ... resto de tu archivo config.js intacto ... */
 
   /* ── Usuarios semilla (CU-3) ─────────────────────────────
      Credenciales para pruebas:
