@@ -13,7 +13,7 @@ const CONFIG = {
 
   /* ── Modelo de IA (Google Gemini) ─────────────────────── */
   model: {
-    id:      'gemini-2.0-flash',
+    id:      'gemini-3.5-flash',
     baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
     apiKey:  p1 + p2,
     get endpoint() {
