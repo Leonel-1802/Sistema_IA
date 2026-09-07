@@ -50,11 +50,17 @@ Puedes responder en el idioma del usuario.`,
   },
 
   /* ── Usuarios semilla (CU-3) ─────────────────────────────
+     Los 4 roles corresponden exactamente a los 4 actores de los
+     Casos de Uso del documento (CU-1..CU-5): Usuario (CU-1, CU-5),
+     Administrador de infraestructura (CU-2), Administrador de
+     seguridad (CU-3) y Científico de datos / Ingeniero de IA (CU-4).
+     "Científico de Datos" y "Analista" NO son roles distintos en el
+     documento — es un único actor, por lo que se unificaron aquí.
      Credenciales para pruebas:
        admin      / admin123
        cientifico / cient123
        infra      / infra123
-       analista   / anali123
+       usuario    / usuario123
      Contraseñas como hash SHA-256 (RQNF-05)             */
   _seedUsers: [
     {
@@ -72,7 +78,7 @@ Puedes responder en el idioma del usuario.`,
       username: 'cientifico',
       password: '6304fd526cf835dec0914c7989e3b6643ce1b45d0ca575e307c7d29acfba3f7b', // cient123
       name:     'Científico de Datos',
-      role:     'Científico de Datos',
+      role:     'Científico de datos / Ingeniero de IA',
       initials: 'CD',
       perms:    ['dashboard', 'model', 'training', 'storage'],
       seed:     true,
@@ -89,12 +95,12 @@ Puedes responder en el idioma del usuario.`,
     },
     {
       id:       'USR-004',
-      username: 'analista',
-      password: '15f8c1133df0aab8482acb3816b47a1e69569b2375f5ff0581c05526a217db6e', // anali123
-      name:     'Analista de Datos',
-      role:     'Analista',
-      initials: 'AD',
-      perms:    ['dashboard', 'model', 'storage'],
+      username: 'usuario',
+      password: 'dfa7a2273567dcd1efffb9a46308e91c20fa13c44c3441bc69cd6a7869b3f7fd', // usuario123
+      name:     'Usuario Final',
+      role:     'Usuario',
+      initials: 'UF',
+      perms:    ['dashboard', 'model'],
       seed:     true,
     },
   ],
@@ -152,7 +158,7 @@ CONFIG.isAllowedDomain = function (url) {
 
 // Versión de datos — incrementar FUERZA reinicialización del
 // localStorage en todos los browsers que tengan datos viejos.
-const _DATA_VERSION = '5';
+const _DATA_VERSION = '6';
 
 CONFIG._initUsersPromise = null;
 
@@ -267,11 +273,10 @@ CONFIG.createUser = async function (data) {
     : parts[0].slice(0, 2).toUpperCase();
 
   const permsMap = {
-    'Analista':                    ['dashboard', 'model', 'storage'],
-    'Científico de Datos':         ['dashboard', 'model', 'training', 'storage'],
-    'Administrador de infraestructura': ['dashboard', 'servers'],
-    'Administrador de seguridad':  ['dashboard', 'model', 'servers', 'training', 'users', 'storage', 'security'],
-    'Operador':                    ['dashboard', 'servers'],
+    'Usuario':                                ['dashboard', 'model'],
+    'Científico de datos / Ingeniero de IA':  ['dashboard', 'model', 'training', 'storage'],
+    'Administrador de infraestructura':       ['dashboard', 'servers'],
+    'Administrador de seguridad':             ['dashboard', 'model', 'servers', 'training', 'users', 'storage', 'security'],
   };
 
   const newUser = {
