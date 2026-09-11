@@ -24,7 +24,7 @@ const CONFIG = {
      semanales). API 100% compatible con el formato OpenAI
      (chat/completions); el cliente fetch no requiere cambios. ─── */
   model: {
-    id:      'minimax/minimax-m3:free',
+    id:      'openrouter/free',
     baseUrl: 'https://openrouter.ai/api/v1',
     /* La key se arma en runtime a partir de fragmentos para que
        no quede como string reconocible de un vistazo en el

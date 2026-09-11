@@ -2068,6 +2068,10 @@
                   </span>
                   <span class="timer-value" id="timer-display">—</span>
                 </div>
+              </div>
+            </div>
+
+            <div class="card">
               <div class="card-header" style="padding:10px 14px;">
                 <span class="card-title">Flujo de Subsistemas</span>
               </div>
@@ -4052,6 +4056,9 @@ const Chat = (() => {
       max_tokens: CONFIG.model.maxOutputTokens,
       temperature: CONFIG.model.temperature,
       stream: false,
+      plugins: [
+        { id: 'file-parser', pdf: { engine: 'pdf-text' } },
+      ],
     };
 
     const targetUrl = CONFIG.model.endpoint;
