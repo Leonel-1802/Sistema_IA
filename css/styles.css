@@ -740,7 +740,7 @@ tbody tr:hover td { background: var(--bg-elevated); color: var(--text-primary); 
 
 /* ── View panels (tabs) ─────────────────────────────────────── */
 .view-panel { display: none; }
-.view-panel.active { display: block; }
+.view-panel.active { display: flex; flex-direction: column; gap: 16px; }
 
 /* ── Metric card ─────────────────────────────────────────────── */
 .metric-grid {
@@ -1007,6 +1007,98 @@ tbody tr:hover td { background: var(--bg-elevated); color: var(--text-primary); 
   gap: 12px;
   overflow-y: auto;
 }
+
+/* ── Núcleo del Modelo IA — Red neuronal / Motor de inferencia ──
+   Simulación visual del RQF-10 (capas + inferencia). No sustituye
+   la llamada real al modelo, solo la representa gráficamente. ── */
+.neural-core-svg { display: block; width: 100%; height: auto; }
+
+.neuron {
+  fill: var(--bg-elevated);
+  stroke: var(--border-light);
+  stroke-width: 1.5;
+  transition: fill 0.25s ease, stroke 0.25s ease;
+}
+.synapse {
+  stroke: var(--border);
+  stroke-width: 1;
+  fill: none;
+  transition: stroke 0.25s ease, stroke-width 0.25s ease;
+}
+
+/* Estado inactivo (reposo) */
+.neural-core-svg.idle .neuron { fill: var(--bg-elevated); stroke: var(--border-light); }
+.neural-core-svg.idle .synapse { stroke: var(--border); }
+
+/* Estado activo — pulso recorriendo capas mientras se espera la respuesta real */
+.neural-core-svg.active .neuron {
+  stroke: var(--primary);
+  animation: neuronPulse 1.4s ease-in-out infinite;
+}
+.neural-core-svg.active .synapse {
+  stroke: var(--primary);
+  stroke-width: 1.4;
+  stroke-dasharray: 4 3;
+  animation: synapseFlow 0.6s linear infinite;
+}
+.neural-core-svg.active .neuron.l0 { animation-delay: 0s; }
+.neural-core-svg.active .neuron.l1 { animation-delay: 0.15s; }
+.neural-core-svg.active .neuron.l2 { animation-delay: 0.3s; }
+.neural-core-svg.active .neuron.l3 { animation-delay: 0.45s; }
+
+@keyframes neuronPulse {
+  0%, 100% { fill: var(--bg-elevated); }
+  50%      { fill: var(--primary-dim); }
+}
+@keyframes synapseFlow {
+  to { stroke-dashoffset: -14; }
+}
+
+/* Estado completado — breve destello de éxito */
+.neural-core-svg.done .neuron  { stroke: var(--success); fill: var(--success-dim); }
+.neural-core-svg.done .synapse { stroke: var(--success); }
+
+.neural-core-svg.error .neuron  { stroke: var(--danger); fill: var(--danger-dim); }
+.neural-core-svg.error .synapse { stroke: var(--danger); }
+
+.inference-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.inference-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.inference-step .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--border-light);
+  flex-shrink: 0;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+.inference-step.active { color: var(--text-secondary); }
+.inference-step.active .dot {
+  background: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-dim);
+  animation: dotBlink 0.9s ease-in-out infinite;
+}
+.inference-step.done { color: var(--text-secondary); }
+.inference-step.done .dot { background: var(--success); box-shadow: none; }
+@keyframes dotBlink { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.neural-core-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  color: var(--text-muted);
+  padding-top: 8px;
+  margin-top: 2px;
+  border-top: 1px solid var(--border);
+}
+.neural-core-meta span.font-mono { color: var(--text-secondary); }
 
 /* ── Log entries ─────────────────────────────────────────────── */
 .log-entry {

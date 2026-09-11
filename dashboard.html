@@ -295,6 +295,53 @@
     .message-time { font-size: 10px; color: var(--text-muted); }
     .message.user .message-time { text-align: right; }
 
+    /* RQNF-01: Badge de tiempo de respuesta en burbuja del asistente */
+    .response-time-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 20px;
+      margin-top: 4px;
+      border: 1px solid;
+      width: fit-content;
+    }
+    .response-time-badge.ok     { color: var(--success); background: var(--success-dim); border-color: var(--success); }
+    .response-time-badge.warn   { color: var(--warning); background: var(--warning-dim); border-color: var(--warning); }
+    .response-time-badge.slow   { color: var(--danger);  background: var(--danger-dim);  border-color: var(--danger); }
+
+    /* RQNF-01: Cronómetro en vivo en el sidebar */
+    .response-timer-live {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      transition: border-color 0.3s;
+    }
+    .response-timer-live.running {
+      border-color: var(--primary);
+      animation: timerPulse 1s ease infinite;
+    }
+    .response-timer-live.ok   { border-color: var(--success); }
+    .response-timer-live.warn { border-color: var(--warning); }
+    .response-timer-live.slow { border-color: var(--danger);  }
+    @keyframes timerPulse {
+      0%,100% { box-shadow: 0 0 0 0 transparent; }
+      50%      { box-shadow: 0 0 0 3px var(--primary-dim); }
+    }
+    .timer-label { color: var(--text-muted); }
+    .timer-value { font-family: var(--font-mono); font-weight: 700; font-size: 13px; color: var(--text-primary); }
+    .timer-value.running { color: var(--primary); }
+    .timer-value.ok      { color: var(--success); }
+    .timer-value.warn    { color: var(--warning); }
+    .timer-value.slow    { color: var(--danger); }
+
     /* Retroalimentacion inline — CU-5 */
     .feedback-bar {
       display: flex;
@@ -661,6 +708,137 @@
       text-align: right;
       flex-shrink: 0;
     }
+
+    /* ── RQNF-02: Nodos escalados automáticamente ─────────── */
+    .server-card.scaled {
+      border-color: var(--primary);
+      background: var(--primary-dim);
+      animation: nodeIn 0.5s ease;
+    }
+    .server-card.failed {
+      border-color: var(--text-muted);
+      opacity: 0.55;
+    }
+    .server-card.redirecting {
+      border-color: var(--warning);
+      box-shadow: 0 0 0 2px var(--warning);
+      animation: pulse-warn 1s ease 3;
+    }
+    @keyframes nodeIn {
+      from { opacity: 0; transform: scale(0.88); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    @keyframes pulse-warn {
+      0%,100% { box-shadow: 0 0 0 2px transparent; }
+      50%      { box-shadow: 0 0 0 4px var(--warning); }
+    }
+    .server-scaled-badge {
+      display: none;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--primary);
+      background: var(--primary-dim);
+      border: 1px solid var(--primary);
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+    .server-card.scaled .server-scaled-badge { display: flex; }
+    .server-card.scaled .server-alert-badge  { display: none !important; }
+    .server-failed-badge {
+      display: none;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+    .server-card.failed .server-failed-badge { display: flex; }
+    .server-card.failed .server-alert-badge  { display: none !important; }
+    /* Barra de escala horizontal */
+    .servers-scale-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      flex-wrap: wrap;
+    }
+    .servers-scale-bar .scale-label { color: var(--text-muted); flex-shrink: 0; }
+    .servers-scale-bar .scale-nodes {
+      display: flex;
+      gap: 6px;
+      flex: 1;
+      flex-wrap: wrap;
+    }
+    .scale-node-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--success);
+      transition: background 0.4s;
+    }
+    .scale-node-dot.auto   { background: var(--primary); }
+    .scale-node-dot.failed { background: var(--text-muted); }
+    .servers-scale-bar .scale-info { color: var(--text-secondary); font-size: 11px; }
+    /* Grid flexible para acomodar nodos extra */
+    .servers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    /* Botones de simulación por tarjeta */
+    .server-sim-btns {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
+      border-top: 1px solid var(--border);
+      padding-top: 8px;
+    }
+    .server-sim-btn {
+      flex: 1;
+      font-size: 10px;
+      padding: 4px 6px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .server-sim-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .server-sim-btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+    .server-sim-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    /* Flecha de redirección animada */
+    .redirect-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-surface);
+      border: 1px solid var(--warning);
+      border-radius: var(--radius-md);
+      padding: 10px 20px;
+      font-size: 12px;
+      color: var(--warning);
+      font-weight: 600;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      animation: toastIn 0.3s ease;
+    }
+    .redirect-toast.hide { animation: toastOut 0.3s ease forwards; }
+    @keyframes toastIn  { from { opacity:0; transform:translateX(-50%) translateY(10px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+    @keyframes toastOut { from { opacity:1; } to { opacity:0; } }
 
     /* ── Panel Entrenamiento (CU-4) ──────────────────────── */
     #panel-training {
@@ -1448,6 +1626,40 @@
 
         </div>
 
+        <!-- RQNF-15: Monitor de red -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Red de sincronización (RQNF-15)</span>
+            <span class="badge" id="cx-net-badge"
+              style="font-size:10px;background:var(--bg-elevated);color:var(--text-muted);border:1px solid var(--border);">
+              Verificando…
+            </span>
+          </div>
+          <div class="card-body" style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;padding:16px;">
+            <div style="flex:1;min-width:130px;">
+              <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;">Latencia</div>
+              <div class="font-mono" id="cx-lat-val" style="font-size:26px;font-weight:700;color:var(--text-muted);transition:color .4s;">— ms</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">umbral: &lt; 100 ms</div>
+              <div style="height:5px;background:var(--border);border-radius:3px;margin-top:8px;overflow:hidden;">
+                <div id="cx-lat-bar" style="height:100%;width:0%;background:var(--success);border-radius:3px;transition:width .8s,background .4s;"></div>
+              </div>
+            </div>
+            <div style="flex:1;min-width:130px;">
+              <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;">Throughput</div>
+              <div class="font-mono" id="cx-bw-val" style="font-size:26px;font-weight:700;color:var(--text-muted);transition:color .4s;">— Mb/s</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">umbral: ≥ 10 Mb/s</div>
+              <div style="height:5px;background:var(--border);border-radius:3px;margin-top:8px;overflow:hidden;">
+                <div id="cx-bw-bar" style="height:100%;width:0%;background:var(--success);border-radius:3px;transition:width .8s,background .4s;"></div>
+              </div>
+            </div>
+            <div style="flex:1;min-width:130px;display:flex;flex-direction:column;justify-content:center;gap:6px;">
+              <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;">Estado RQNF-15</div>
+              <div id="cx-net-state" style="font-size:14px;font-weight:700;color:var(--text-muted);transition:color .4s;">—</div>
+              <div id="cx-net-note" style="font-size:11px;color:var(--text-muted);">Esperando primera medición…</div>
+            </div>
+          </div>
+        </div>
+
       </div>
       <!-- /panel-conexion -->
 
@@ -1712,6 +1924,46 @@
 
         </div>
 
+        <!-- RQNF-06 — Usabilidad: guía de inicio rápido para usuario nuevo -->
+        <div class="card" style="margin-top:0;">
+          <div class="card-header">
+            <span class="card-title">Guía de Inicio Rápido — RQNF-06</span>
+            <span class="badge badge-success" style="font-size:9px;">RQNF-06 · Usabilidad</span>
+          </div>
+          <div class="card-body" style="padding:14px;">
+            <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;">
+              La interfaz debe ser intuitiva: un usuario nuevo puede realizar una consulta sin capacitación previa. Flujo básico en 3 pasos:
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+              <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px;display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="width:22px;height:22px;border-radius:50%;background:var(--primary-dim);color:var(--primary);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</span>
+                  <span style="font-size:18px;">🔑</span>
+                  <span style="font-size:12px;font-weight:700;color:var(--text-primary);">Inicia sesión</span>
+                </div>
+                <div style="font-size:11px;color:var(--text-muted);">Usa las credenciales de tu rol. El sistema te redirige automáticamente según tus permisos.</div>
+              </div>
+              <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px;display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="width:22px;height:22px;border-radius:50%;background:var(--primary-dim);color:var(--primary);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</span>
+                  <span style="font-size:18px;">✍</span>
+                  <span style="font-size:12px;font-weight:700;color:var(--text-primary);">Escribe tu consulta</span>
+                </div>
+                <div style="font-size:11px;color:var(--text-muted);">En el panel "Modelo IA / MML", escribe tu pregunta o adjunta una imagen/PDF y pulsa Enviar.</div>
+                <button class="btn btn-ghost btn-sm" onclick="UI.goTo('model')" style="font-size:10px;margin-top:4px;align-self:flex-start;">Ir ahora →</button>
+              </div>
+              <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px;display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="width:22px;height:22px;border-radius:50%;background:var(--primary-dim);color:var(--primary);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</span>
+                  <span style="font-size:18px;">⭐</span>
+                  <span style="font-size:12px;font-weight:700;color:var(--text-primary);">Evalúa la respuesta</span>
+                </div>
+                <div style="font-size:11px;color:var(--text-muted);">Pulsa el botón de retroalimentación junto a la respuesta del modelo y califica con estrellas.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
       <!-- /panel-interfaz -->
 
@@ -1781,7 +2033,41 @@
           <!-- Sidebar: pipeline + sesion -->
           <div class="chat-sidebar">
 
+            <!-- ═══ Núcleo del Modelo IA / MML — Red neuronal + Motor de inferencia (simulado, RQF-10) ═══ -->
             <div class="card">
+              <div class="card-header" style="padding:10px 14px;">
+                <span class="card-title">Núcleo del Modelo IA / MML</span>
+                <span id="nc-status-badge" class="badge" style="font-size:9px;background:var(--bg-elevated);color:var(--text-muted);border:1px solid var(--border);">En reposo</span>
+              </div>
+              <div class="card-body" style="padding:10px 14px;display:flex;flex-direction:column;gap:10px;">
+
+                <svg id="nc-svg" class="neural-core-svg idle" viewBox="0 0 260 110" xmlns="http://www.w3.org/2000/svg">
+                  <!-- sinapsis: capa0(3) -> capa1(4) -->
+                  <g id="nc-synapses"></g>
+                  <!-- neuronas -->
+                  <g id="nc-neurons"></g>
+                </svg>
+
+                <div class="inference-steps" id="nc-steps">
+                  <div class="inference-step" data-step="0"><span class="dot"></span> Tokenizando entrada</div>
+                  <div class="inference-step" data-step="1"><span class="dot"></span> Propagación en capas ocultas</div>
+                  <div class="inference-step" data-step="2"><span class="dot"></span> Generando predicción</div>
+                </div>
+
+                <div class="neural-core-meta">
+                  <span>Capas: <span class="font-mono" id="nc-layers">—</span></span>
+                  <span>Neuronas: <span class="font-mono" id="nc-neuron-count">—</span></span>
+                  <span>Latencia: <span class="font-mono" id="nc-latency">—</span></span>
+                </div>
+
+                <!-- RQNF-01: Cronómetro de tiempo de respuesta en vivo -->
+                <div class="response-timer-live" id="response-timer-live">
+                  <span class="timer-label">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:3px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    Tiempo respuesta (RQNF-01)
+                  </span>
+                  <span class="timer-value" id="timer-display">—</span>
+                </div>
               <div class="card-header" style="padding:10px 14px;">
                 <span class="card-title">Flujo de Subsistemas</span>
               </div>
@@ -1867,6 +2153,10 @@
                   <span class="text-muted">Historial</span>
                   <span id="stat-history" class="font-mono">0 msgs</span>
                 </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span class="text-muted">Tiempo prom. respuesta</span>
+                  <span id="stat-avg-time" class="font-mono" style="font-size:11px;">—</span>
+                </div>
                 <hr style="border:none;border-top:1px solid var(--border);margin:4px 0;">
                 <button class="btn btn-ghost btn-sm" onclick="Chat.clearHistory()" style="width:100%;justify-content:center;font-size:11px;">
                   Limpiar historial
@@ -1894,8 +2184,101 @@
           <span class="servers-refresh-note" id="servers-last-update">actualiza cada 5s</span>
         </div>
 
+        <!-- RQNF-02: Barra de escalado horizontal automático -->
+        <div class="servers-scale-bar" id="servers-scale-bar">
+          <span class="scale-label">Escalado horizontal (RQNF-02):</span>
+          <div class="scale-nodes" id="scale-nodes-dots"></div>
+          <span class="scale-info" id="scale-info-text">3 nodos base · 0 adicionales · máx 5 extras</span>
+          <button class="server-sim-btn" style="flex:none;font-size:11px;padding:4px 10px;" onclick="Servers.triggerScaleNow()">⚡ Simular carga alta</button>
+          <button class="server-sim-btn" style="flex:none;font-size:11px;padding:4px 10px;" onclick="Servers.resetScale()">↺ Resetear</button>
+        </div>
+
         <!-- Grid de nodos -->
         <div class="servers-grid" id="servers-grid"></div>
+
+        <!-- RQNF-03 / RQNF-04 / RQNF-09 — Disponibilidad, Tolerancia y Portabilidad -->
+        <div class="grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+
+          <!-- RQNF-03 Uptime -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Disponibilidad del Sistema</span>
+              <span class="badge badge-success" style="font-size:9px;">RQNF-03 · SIMULADO</span>
+            </div>
+            <div class="card-body" style="padding:14px;display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:11px;color:var(--text-muted);">Uptime mensual (objetivo ≥ 99%)</span>
+                <span id="srv-uptime-pct" style="font-size:18px;font-weight:800;color:var(--success);font-family:var(--font-mono);">99.96%</span>
+              </div>
+              <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
+                <div style="height:100%;width:99.96%;background:var(--success);border-radius:3px;"></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px;font-size:11px;">
+                <div style="display:flex;justify-content:space-between;">
+                  <span class="text-muted">Tiempo activo estimado</span>
+                  <span id="srv-uptime-hours" class="font-mono">—</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                  <span class="text-muted">Última caída registrada</span>
+                  <span class="font-mono" style="color:var(--success);">Ninguna en este período</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                  <span class="text-muted">Estado SLA</span>
+                  <span class="badge badge-success" style="font-size:9px;">CUMPLE · 99.9% mín.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RQNF-09 Portabilidad -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Portabilidad de Despliegue</span>
+              <span class="badge badge-muted" style="font-size:9px;">RQNF-09 · SIMULADO</span>
+            </div>
+            <div class="card-body" style="padding:14px;display:flex;flex-direction:column;gap:8px;">
+              <div style="font-size:11px;color:var(--text-muted);">El sistema puede desplegarse en distintos entornos sin cambios estructurales:</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 8px;background:var(--bg-elevated);border-radius:var(--radius-md);font-size:11px;">
+                <div><span style="color:var(--text-primary);font-weight:600;">☁ Nube pública</span><span style="color:var(--text-muted);margin-left:6px;">AWS / GCP / Azure</span></div>
+                <span style="color:var(--success);font-size:13px;">✓</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 8px;background:var(--bg-elevated);border-radius:var(--radius-md);font-size:11px;">
+                <div><span style="color:var(--text-primary);font-weight:600;">🏢 On-premise</span><span style="color:var(--text-muted);margin-left:6px;">Datacenter propio / bare metal</span></div>
+                <span style="color:var(--success);font-size:13px;">✓</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 8px;background:var(--bg-elevated);border-radius:var(--radius-md);font-size:11px;">
+                <div><span style="color:var(--text-primary);font-weight:600;">🐳 Contenedores</span><span style="color:var(--text-muted);margin-left:6px;">Docker + Kubernetes</span></div>
+                <span style="color:var(--success);font-size:13px;">✓</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 8px;background:var(--bg-elevated);border-radius:var(--radius-md);font-size:11px;">
+                <div><span style="color:var(--text-primary);font-weight:600;">🖥 Servidor local</span><span style="color:var(--text-muted);margin-left:6px;">Linux Ubuntu Server</span></div>
+                <span style="color:var(--success);font-size:13px;">✓</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RQNF-04 — Tolerancia a fallos (demo) -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Tolerancia a Fallos — Redirección Automática</span>
+            <span class="badge badge-warning" style="font-size:9px;">RQNF-04 · SIMULADO</span>
+          </div>
+          <div class="card-body" style="padding:14px;display:flex;flex-direction:column;gap:10px;">
+            <div style="font-size:12px;color:var(--text-secondary);">
+              Ante la caída de un nodo, el coordinador de carga redirige las tareas a los nodos disponibles sin pérdida de datos.
+              Usa los botones "Simular fallo" en cada tarjeta de servidor para ver la redirección en acción.
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-md);font-size:11px;" id="rqnf04-status">
+              <span class="status-dot online"></span>
+              <span style="color:var(--text-secondary);">Todos los nodos operativos — coordinador de carga en modo normal.</span>
+            </div>
+            <div style="font-size:10px;color:var(--text-muted);">
+              El historial de redirecciones aparece en la bitácora de auditoría (Ciberseguridad → Bitácora).
+            </div>
+          </div>
+        </div>
 
         <!-- Historial de alertas -->
         <div class="card">
@@ -1904,6 +2287,40 @@
             <span class="text-muted" style="font-size:10px;" id="servers-alert-count">Sin alertas</span>
           </div>
           <div class="card-body" style="padding:0;max-height:200px;overflow-y:auto;" id="servers-alert-log"></div>
+        </div>
+
+        <!-- RQNF-15: Monitor de red -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Red de sincronización (RQNF-15)</span>
+            <span class="badge" id="srv-net-badge"
+              style="font-size:10px;background:var(--bg-elevated);color:var(--text-muted);border:1px solid var(--border);">
+              Verificando…
+            </span>
+          </div>
+          <div class="card-body" style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;padding:16px;">
+            <div style="flex:1;min-width:130px;">
+              <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;">Latencia</div>
+              <div class="font-mono" id="srv-lat-val" style="font-size:26px;font-weight:700;color:var(--text-muted);transition:color .4s;">— ms</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">umbral: &lt; 100 ms</div>
+              <div style="height:5px;background:var(--border);border-radius:3px;margin-top:8px;overflow:hidden;">
+                <div id="srv-lat-bar" style="height:100%;width:0%;background:var(--success);border-radius:3px;transition:width .8s,background .4s;"></div>
+              </div>
+            </div>
+            <div style="flex:1;min-width:130px;">
+              <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;">Throughput</div>
+              <div class="font-mono" id="srv-bw-val" style="font-size:26px;font-weight:700;color:var(--text-muted);transition:color .4s;">— Mb/s</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">umbral: ≥ 10 Mb/s</div>
+              <div style="height:5px;background:var(--border);border-radius:3px;margin-top:8px;overflow:hidden;">
+                <div id="srv-bw-bar" style="height:100%;width:0%;background:var(--success);border-radius:3px;transition:width .8s,background .4s;"></div>
+              </div>
+            </div>
+            <div style="flex:1;min-width:130px;display:flex;flex-direction:column;justify-content:center;gap:6px;">
+              <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;">Estado RQNF-15</div>
+              <div id="srv-net-state" style="font-size:14px;font-weight:700;color:var(--text-muted);transition:color .4s;">—</div>
+              <div id="srv-net-note" style="font-size:11px;color:var(--text-muted);">Esperando primera medición…</div>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -1993,8 +2410,52 @@
 
           </div>
 
-          <!-- Columna derecha: precision + cache -->
+          <!-- Columna derecha: red neuronal + precision + cache -->
           <div style="display:flex;flex-direction:column;gap:16px;">
+
+            <!-- Red Neuronal — visualización en vivo (RQF-10, CU-4) -->
+            <div class="card" id="nn-vis-card">
+              <div class="card-header">
+                <span class="card-title">Red Neuronal</span>
+                <span id="nn-layer-label" style="font-size:10px;color:var(--text-muted);">idle</span>
+              </div>
+              <div class="card-body" style="padding:10px 14px;">
+
+                <!-- SVG de la red neuronal -->
+                <svg id="nn-svg" viewBox="0 0 260 130" xmlns="http://www.w3.org/2000/svg"
+                     style="width:100%;height:auto;display:block;">
+
+                  <!-- Conexiones — dibujadas primero para quedar detrás -->
+                  <g id="nn-edges" stroke="var(--border)" stroke-width="0.8" fill="none" opacity="0.5"></g>
+
+                  <!-- Neuronas — se dibujan encima -->
+                  <g id="nn-neurons"></g>
+
+                  <!-- Etiquetas de capas -->
+                  <text x="28"  y="124" text-anchor="middle" font-size="7" fill="var(--text-muted)" font-family="monospace">Entrada</text>
+                  <text x="93"  y="124" text-anchor="middle" font-size="7" fill="var(--text-muted)" font-family="monospace">Oculta 1</text>
+                  <text x="158" y="124" text-anchor="middle" font-size="7" fill="var(--text-muted)" font-family="monospace">Oculta 2</text>
+                  <text x="232" y="124" text-anchor="middle" font-size="7" fill="var(--text-muted)" font-family="monospace">Salida</text>
+                </svg>
+
+                <!-- Métricas en vivo por época -->
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px;">
+                  <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 8px;text-align:center;">
+                    <div style="font-size:9px;color:var(--text-muted);margin-bottom:2px;">LOSS</div>
+                    <div id="nn-loss" style="font-size:14px;font-weight:700;color:var(--text-primary);font-family:monospace;">—</div>
+                  </div>
+                  <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 8px;text-align:center;">
+                    <div style="font-size:9px;color:var(--text-muted);margin-bottom:2px;">ACCURACY</div>
+                    <div id="nn-acc" style="font-size:14px;font-weight:700;color:var(--text-primary);font-family:monospace;">—</div>
+                  </div>
+                  <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 8px;text-align:center;">
+                    <div style="font-size:9px;color:var(--text-muted);margin-bottom:2px;">ÉPOCA</div>
+                    <div id="nn-epoch" style="font-size:14px;font-weight:700;color:var(--text-primary);font-family:monospace;">—</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
 
             <!-- Display de precision -->
             <div class="card">
@@ -2022,6 +2483,40 @@
 
           </div>
 
+        </div>
+
+        <!-- RQNF-15: Monitor de red -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Red de sincronización (RQNF-15)</span>
+            <span class="badge" id="tr-net-badge"
+              style="font-size:10px;background:var(--bg-elevated);color:var(--text-muted);border:1px solid var(--border);">
+              Verificando…
+            </span>
+          </div>
+          <div class="card-body" style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;padding:16px;">
+            <div style="flex:1;min-width:130px;">
+              <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;">Latencia</div>
+              <div class="font-mono" id="tr-lat-val" style="font-size:26px;font-weight:700;color:var(--text-muted);transition:color .4s;">— ms</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">umbral: &lt; 100 ms</div>
+              <div style="height:5px;background:var(--border);border-radius:3px;margin-top:8px;overflow:hidden;">
+                <div id="tr-lat-bar" style="height:100%;width:0%;background:var(--success);border-radius:3px;transition:width .8s,background .4s;"></div>
+              </div>
+            </div>
+            <div style="flex:1;min-width:130px;">
+              <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;">Throughput</div>
+              <div class="font-mono" id="tr-bw-val" style="font-size:26px;font-weight:700;color:var(--text-muted);transition:color .4s;">— Mb/s</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">umbral: ≥ 10 Mb/s</div>
+              <div style="height:5px;background:var(--border);border-radius:3px;margin-top:8px;overflow:hidden;">
+                <div id="tr-bw-bar" style="height:100%;width:0%;background:var(--success);border-radius:3px;transition:width .8s,background .4s;"></div>
+              </div>
+            </div>
+            <div style="flex:1;min-width:130px;display:flex;flex-direction:column;justify-content:center;gap:6px;">
+              <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;">Estado RQNF-15</div>
+              <div id="tr-net-state" style="font-size:14px;font-weight:700;color:var(--text-muted);transition:color .4s;">—</div>
+              <div id="tr-net-note" style="font-size:11px;color:var(--text-muted);">Esperando primera medición…</div>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -2080,16 +2575,58 @@
 
         <div class="grid-2">
 
-          <!-- Autenticacion y acceso — REAL -->
+          <!-- Gestion de Usuarios — REAL (CU-3 completo) -->
           <div class="card">
             <div class="card-header">
-              <span class="card-title">Autenticacion y Acceso</span>
-              <span class="badge badge-success" style="font-size:9px;">REAL &middot;</span>
+              <span class="card-title">Gestion de Usuarios</span>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span class="badge badge-success" style="font-size:9px;">REAL · CU-3</span>
+                <button class="btn btn-primary btn-sm" id="sec-btn-new-user"
+                  onclick="Security.openNewUserForm()"
+                  style="font-size:11px;">+ Crear usuario</button>
+              </div>
             </div>
+
+            <!-- Formulario de creacion (colapsado por defecto) -->
+            <div id="sec-user-form" style="display:none;padding:14px 16px;border-bottom:1px solid var(--border);background:var(--bg-elevated);">
+              <div style="font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">Nuevo usuario</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <div class="form-group" style="margin:0;">
+                  <label class="form-label" style="font-size:10px;">Nombre completo</label>
+                  <input class="form-input" id="sec-new-name" placeholder="Ej. Ana Garcia" style="font-size:12px;" />
+                </div>
+                <div class="form-group" style="margin:0;">
+                  <label class="form-label" style="font-size:10px;">Usuario</label>
+                  <input class="form-input" id="sec-new-username" placeholder="sin espacios" style="font-size:12px;" />
+                </div>
+                <div class="form-group" style="margin:0;">
+                  <label class="form-label" style="font-size:10px;">Contrasena</label>
+                  <input class="form-input" type="password" id="sec-new-password" placeholder="minimo 6 chars" style="font-size:12px;" />
+                </div>
+                <div class="form-group" style="margin:0;">
+                  <label class="form-label" style="font-size:10px;">Rol</label>
+                  <select class="form-select-styled" id="sec-new-role" style="font-size:12px;padding:8px 28px 8px 10px;">
+                    <option value="">— Seleccionar —</option>
+                    <option value="Usuario">Usuario</option>
+                    <option value="Cientifico de datos / Ingeniero de IA">Cientifico / Ing. IA</option>
+                    <option value="Administrador de infraestructura">Admin. Infraestructura</option>
+                    <option value="Administrador de seguridad">Admin. Seguridad</option>
+                  </select>
+                </div>
+              </div>
+              <div id="sec-user-form-msg" style="font-size:11px;color:var(--danger);margin-top:8px;display:none;"></div>
+              <div style="display:flex;gap:8px;margin-top:12px;">
+                <button class="btn btn-primary btn-sm" onclick="Security.submitNewUser()" style="font-size:11px;">Guardar usuario</button>
+                <button class="btn btn-ghost btn-sm" onclick="Security.closeNewUserForm()" style="font-size:11px;">Cancelar</button>
+              </div>
+            </div>
+
+            <div id="sec-user-toast" style="display:none;padding:8px 16px;font-size:11px;border-bottom:1px solid var(--border);"></div>
+
             <div class="card-body" style="padding:0;max-height:280px;overflow-y:auto;">
               <div class="table-wrap">
                 <table>
-                  <thead><tr><th>Usuario</th><th>Rol</th><th>Permisos</th><th>Estado</th></tr></thead>
+                  <thead><tr><th>ID</th><th>Usuario</th><th>Rol</th><th>Permisos</th><th>Estado</th><th></th></tr></thead>
                   <tbody id="sec-users-table"></tbody>
                 </table>
               </div>
@@ -2167,6 +2704,113 @@
             <div class="card-body" style="padding:12px;display:flex;flex-direction:column;gap:10px;" id="sec-relations-list"></div>
           </div>
 
+        </div>
+
+        <!-- RQNF-07 / RQNF-11 / RQNF-13 — Mantenibilidad, Hardware y Presupuesto -->
+        <div class="grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+
+          <!-- RQNF-07 Mantenibilidad: mapa de módulos -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Modularidad del Sistema</span>
+              <span class="badge badge-muted" style="font-size:9px;">RQNF-07 · Mantenibilidad</span>
+            </div>
+            <div class="card-body" style="padding:14px;display:flex;flex-direction:column;gap:6px;">
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">Cada módulo es independiente — actualizaciones no afectan otros subsistemas:</div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:11px;padding:3px 0;border-bottom:1px solid var(--border);"><span style="color:var(--success);font-size:12px;">⬡</span><span class="font-mono" style="color:var(--primary);min-width:90px;">Crypto</span><span style="color:var(--text-muted);">AES-256-GCM en reposo y tránsito</span></div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:11px;padding:3px 0;border-bottom:1px solid var(--border);"><span style="color:var(--success);font-size:12px;">⬡</span><span class="font-mono" style="color:var(--primary);min-width:90px;">Auth</span><span style="color:var(--text-muted);">Sesiones, roles, bitácora</span></div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:11px;padding:3px 0;border-bottom:1px solid var(--border);"><span style="color:var(--success);font-size:12px;">⬡</span><span class="font-mono" style="color:var(--primary);min-width:90px;">Config</span><span style="color:var(--text-muted);">Usuarios, modelo, claves storage</span></div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:11px;padding:3px 0;border-bottom:1px solid var(--border);"><span style="color:var(--success);font-size:12px;">⬡</span><span class="font-mono" style="color:var(--primary);min-width:90px;">Chat / Modelo</span><span style="color:var(--text-muted);">Portal de consultas multimodal</span></div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:11px;padding:3px 0;border-bottom:1px solid var(--border);"><span style="color:var(--success);font-size:12px;">⬡</span><span class="font-mono" style="color:var(--primary);min-width:90px;">Servers</span><span style="color:var(--text-muted);">Monitor de salud y escalado</span></div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:11px;padding:3px 0;border-bottom:1px solid var(--border);"><span style="color:var(--success);font-size:12px;">⬡</span><span class="font-mono" style="color:var(--primary);min-width:90px;">Training</span><span style="color:var(--text-muted);">Motor de aprendizaje (CU-4)</span></div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:11px;padding:3px 0;border-bottom:1px solid var(--border);"><span style="color:var(--success);font-size:12px;">⬡</span><span class="font-mono" style="color:var(--primary);min-width:90px;">Security</span><span style="color:var(--text-muted);">Panel de ciberseguridad (CU-3)</span></div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:11px;padding:3px 0;"><span style="color:var(--success);font-size:12px;">⬡</span><span class="font-mono" style="color:var(--primary);min-width:90px;">FuenteDatos</span><span style="color:var(--text-muted);">Ingesta de datos (simulado)</span></div>
+            </div>
+          </div>
+
+          <!-- RQNF-11 Hardware GPU/TPU + RQNF-13 Presupuesto -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Requisitos de Hardware</span>
+              <span class="badge badge-muted" style="font-size:9px;">RQNF-11 / RQNF-13 · SIMULADO</span>
+            </div>
+            <div class="card-body" style="padding:14px;display:flex;flex-direction:column;gap:8px;">
+              <div style="font-size:11px;color:var(--text-muted);">Compatibilidad de hardware requerida (RQNF-11):</div>
+              <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-md);padding:7px 10px;font-size:11px;display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--success);font-weight:700;flex-shrink:0;">✓</span><div><span style="font-weight:600;color:var(--text-primary);">GPU/TPU:</span> <span style="color:var(--text-muted);">NVIDIA A100 / TPU v4 (entrenamiento + inferencia)</span></div></div>
+              <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-md);padding:7px 10px;font-size:11px;display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--success);font-weight:700;flex-shrink:0;">✓</span><div><span style="font-weight:600;color:var(--text-primary);">RAM:</span> <span style="color:var(--text-muted);">≥ 64 GB por nodo (procesamiento simultáneo)</span></div></div>
+              <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-md);padding:7px 10px;font-size:11px;display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--success);font-weight:700;flex-shrink:0;">✓</span><div><span style="font-weight:600;color:var(--text-primary);">SSD:</span> <span style="color:var(--text-muted);">≥ 2 TB NVMe (caché de modelos + resultados)</span></div></div>
+              <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-md);padding:7px 10px;font-size:11px;display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--success);font-weight:700;flex-shrink:0;">✓</span><div><span style="font-weight:600;color:var(--text-primary);">CPU:</span> <span style="color:var(--text-muted);">Server-class ≥ 32 núcleos (coordinación de carga)</span></div></div>
+              <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-md);padding:7px 10px;font-size:11px;display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--success);font-weight:700;flex-shrink:0;">✓</span><div><span style="font-weight:600;color:var(--text-primary);">Red:</span> <span style="color:var(--text-muted);">≥ 10 Gbps entre nodos distribuidos</span></div></div>
+              <div style="margin-top:6px;padding:8px 10px;background:var(--warning-dim);border:1px solid var(--warning);border-radius:var(--radius-md);font-size:11px;color:var(--warning);">
+                ⚠ RQNF-13: El sistema opera dentro del presupuesto y hardware asignado al proyecto. El tier gratuito de OpenRouter cubre el prototipo.
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RQNF-12: Normativa de protección de datos -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Normativa de protección de datos (RQNF-12)</span>
+            <button class="btn btn-ghost btn-sm" id="sec-norm-btn"
+              onclick="NormativaCheck.verify()" style="font-size:11px;">
+              ⟳ Verificar conformidad
+            </button>
+          </div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:14px;padding:16px;">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <div class="sim-banner" style="flex:1;min-width:200px;background:var(--success-dim);color:var(--success);border-color:rgba(16,185,129,.3);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span><strong>Ley 1581 de 2012</strong> · Colombia — Protección de datos personales</span>
+                <span id="norm-1581-badge" class="badge" style="font-size:10px;background:var(--success-dim);color:var(--success);border-color:rgba(16,185,129,.3);">Conforme</span>
+              </div>
+              <div class="sim-banner" style="flex:1;min-width:200px;background:var(--success-dim);color:var(--success);border-color:rgba(16,185,129,.3);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span><strong>RGPD / GDPR</strong> · UE — Reglamento General de Protección de Datos</span>
+                <span id="norm-rgpd-badge" class="badge" style="font-size:10px;background:var(--success-dim);color:var(--success);border-color:rgba(16,185,129,.3);">Conforme</span>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">Principios aplicados</div>
+              <div id="norm-principles" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;"></div>
+            </div>
+            <div id="norm-log" style="display:none;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-md);padding:10px;max-height:140px;overflow-y:auto;font-size:11px;font-family:var(--font-mono);color:var(--text-secondary);"></div>
+          </div>
+        </div>
+
+        <!-- RQNF-15: Monitor de red -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Red de sincronización (RQNF-15)</span>
+            <span class="badge" id="sec-net-badge"
+              style="font-size:10px;background:var(--bg-elevated);color:var(--text-muted);border:1px solid var(--border);">
+              Verificando…
+            </span>
+          </div>
+          <div class="card-body" style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;padding:16px;">
+            <div style="flex:1;min-width:130px;">
+              <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;">Latencia</div>
+              <div class="font-mono" id="sec-lat-val" style="font-size:26px;font-weight:700;color:var(--text-muted);transition:color .4s;">— ms</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">umbral: &lt; 100 ms</div>
+              <div style="height:5px;background:var(--border);border-radius:3px;margin-top:8px;overflow:hidden;">
+                <div id="sec-lat-bar" style="height:100%;width:0%;background:var(--success);border-radius:3px;transition:width .8s,background .4s;"></div>
+              </div>
+            </div>
+            <div style="flex:1;min-width:130px;">
+              <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;">Throughput</div>
+              <div class="font-mono" id="sec-bw-val" style="font-size:26px;font-weight:700;color:var(--text-muted);transition:color .4s;">— Mb/s</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">umbral: ≥ 10 Mb/s</div>
+              <div style="height:5px;background:var(--border);border-radius:3px;margin-top:8px;overflow:hidden;">
+                <div id="sec-bw-bar" style="height:100%;width:0%;background:var(--success);border-radius:3px;transition:width .8s,background .4s;"></div>
+              </div>
+            </div>
+            <div style="flex:1;min-width:130px;display:flex;flex-direction:column;justify-content:center;gap:6px;">
+              <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;">Estado RQNF-15</div>
+              <div id="sec-net-state" style="font-size:14px;font-weight:700;color:var(--text-muted);transition:color .4s;">—</div>
+              <div id="sec-net-note" style="font-size:11px;color:var(--text-muted);">Esperando primera medición…</div>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -2310,19 +2954,22 @@ const UI = (() => {
     // El panel model necesita height controlada
     const body = document.getElementById('content-body');
     if (view === 'model') {
-      body.style.padding      = '16px';
-      body.style.overflow     = 'hidden';
-      body.style.flex         = '1';
-      body.style.display      = 'flex';
+      body.style.padding       = '16px';
+      body.style.overflow      = 'hidden';
+      body.style.flex          = '1';
+      body.style.display       = 'flex';
       body.style.flexDirection = 'column';
-      panel.style.flex        = '1';
-      panel.style.overflow    = 'hidden';
+      panel.style.flex         = '1';
+      panel.style.overflow     = 'hidden';
     } else {
       body.style.padding       = '24px';
-      body.style.overflow      = '';
+      body.style.overflow      = 'auto'; // ← fix: era '' → dejaba paneles sin scroll
       body.style.flex          = '';
       body.style.display       = '';
       body.style.flexDirection = '';
+      // Resetear estilos inline del panel anterior (model los sobreescribía)
+      panel.style.flex         = '';
+      panel.style.overflow     = '';
     }
   }
 
@@ -2480,18 +3127,34 @@ const Dashboard = (() => {
 
 /* ══════════════════════════════════════════════════════════
    SERVERS — CU-2: monitor salud y recursos cada 5s
+   RQNF-02: escalado horizontal automático (hasta 5 nodos extra)
+   RQNF-04: tolerancia a fallos con redirección de tareas
 ════════════════════════════════════════════════════════ */
 const Servers = (() => {
 
-  const _nodes = [
-    { id: 'sv-1', name: 'Servidor A', cpu: 42, ram: 58, gpu: 35, role: 'Procesamiento' },
-    { id: 'sv-2', name: 'Servidor B', cpu: 67, ram: 72, gpu: 81, role: 'Inferencia IA' },
-    { id: 'sv-3', name: 'Servidor C', cpu: 23, ram: 41, gpu: 19, role: 'Coordinacion de carga' },
+  // Nodos base (siempre presentes)
+  const _baseNodes = [
+    { id: 'sv-1', name: 'Servidor A', cpu: 42, ram: 58, gpu: 35, role: 'Procesamiento',        auto: false, failed: false },
+    { id: 'sv-2', name: 'Servidor B', cpu: 67, ram: 72, gpu: 81, role: 'Inferencia IA',         auto: false, failed: false },
+    { id: 'sv-3', name: 'Servidor C', cpu: 23, ram: 41, gpu: 19, role: 'Coordinacion de carga', auto: false, failed: false },
   ];
 
-  let _alertHistory = [];
-  let _interval     = null;
+  // Pool de nodos extra disponibles para escalado (RQNF-02)
+  const _extraPool = [
+    { id: 'sv-4', name: 'Nodo D',     role: 'Escalado auto · Procesamiento'  },
+    { id: 'sv-5', name: 'Nodo E',     role: 'Escalado auto · Inferencia IA'  },
+    { id: 'sv-6', name: 'Nodo F',     role: 'Escalado auto · Procesamiento'  },
+    { id: 'sv-7', name: 'Nodo G',     role: 'Escalado auto · Inferencia IA'  },
+    { id: 'sv-8', name: 'Nodo H',     role: 'Escalado auto · Coordinacion'   },
+  ];
 
+  let _nodes         = _baseNodes.map(n => ({ ...n }));
+  let _alertHistory  = [];
+  let _interval      = null;
+  let _toastTimer    = null;
+  let _autoScaling   = false;   // bandera para evitar escalar varias veces simultáneamente
+
+  /* ── Helpers de métricas ────────────────────────────────── */
   function _fluctuate (val, min, max, delta) {
     const next = val + (Math.random() - 0.5) * delta;
     return Math.max(min, Math.min(max, Math.round(next)));
@@ -2503,28 +3166,176 @@ const Servers = (() => {
     return 'var(--success)';
   }
 
-  function _metricRow (label, pct) {
+  function _metricRow (label, pct, disabled) {
+    const color = disabled ? 'var(--text-muted)' : _metricColor(pct);
+    const displayPct = disabled ? '—' : `${pct}%`;
+    const width = disabled ? 0 : pct;
     return `
       <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:4px;">
         <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);">
           <span>${label}</span>
-          <span class="font-mono" style="color:${_metricColor(pct)};font-weight:700;">${pct}%</span>
+          <span class="font-mono" style="color:${color};font-weight:700;">${displayPct}</span>
         </div>
         <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
-          <div style="height:100%;width:${pct}%;background:${_metricColor(pct)};border-radius:3px;transition:width 0.8s ease;"></div>
+          <div style="height:100%;width:${width}%;background:${color};border-radius:3px;transition:width 0.8s ease;"></div>
         </div>
       </div>
     `;
   }
 
+  /* ── Toast de redirección (RQNF-04) ──────────────────────── */
+  function _showToast (msg) {
+    // Limpiar toast anterior si existe
+    const old = document.getElementById('redirect-toast');
+    if (old) old.remove();
+    if (_toastTimer) clearTimeout(_toastTimer);
+
+    const el = document.createElement('div');
+    el.id = 'redirect-toast';
+    el.className = 'redirect-toast';
+    el.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>${msg}`;
+    document.body.appendChild(el);
+
+    _toastTimer = setTimeout(() => {
+      el.classList.add('hide');
+      setTimeout(() => el.remove(), 300);
+    }, 3500);
+  }
+
+  /* ── RQNF-02: Escalar automáticamente ─────────────────── */
+  function _checkAndScale () {
+    if (_autoScaling) return;
+
+    const activeNodes = _nodes.filter(n => !n.failed);
+    // Contamos cuántos nodos están por encima del 80% en CPU o GPU
+    const overloaded = activeNodes.filter(n => n.cpu >= 80 || n.gpu >= 80);
+    if (overloaded.length === 0) return;
+
+    const currentExtra = _nodes.filter(n => n.auto).length;
+    if (currentExtra >= 5) return; // máximo alcanzado (RQNF-02)
+
+    _autoScaling = true;
+    const nextPool = _extraPool[currentExtra];
+    if (!nextPool) { _autoScaling = false; return; }
+
+    const newNode = {
+      ...nextPool,
+      cpu:    Math.floor(Math.random() * 20) + 10, // arrancan con carga baja
+      ram:    Math.floor(Math.random() * 25) + 20,
+      gpu:    Math.floor(Math.random() * 20) + 8,
+      auto:   true,
+      failed: false,
+      _new:   true,  // marca para animación de entrada
+    };
+
+    _nodes.push(newNode);
+
+    const overloadedNames = overloaded.map(n => n.name).join(', ');
+    Auth.addLog('INFO',
+      `RQNF-02 · Escalado automático: ${newNode.name} agregado (${currentExtra + 1}/5 extras) — carga alta detectada en ${overloadedNames}`
+    );
+    _showToast(`⚡ Escalado automático: ${newNode.name} incorporado al clúster`);
+
+    // Quitar bandera de "nuevo" tras el primer render para no reanimar
+    setTimeout(() => {
+      const n = _nodes.find(n => n.id === newNode.id);
+      if (n) delete n._new;
+      _autoScaling = false;
+    }, 600);
+  }
+
+  /* ── RQNF-04: Simular fallo de un nodo ─────────────────── */
+  function simulateFail (nodeId) {
+    const node = _nodes.find(n => n.id === nodeId);
+    if (!node || node.failed) return;
+
+    node.failed = true;
+    node.cpu = 0; node.ram = 0; node.gpu = 0;
+
+    // Encontrar otro nodo activo que absorba las tareas
+    const candidates = _nodes.filter(n => !n.failed && n.id !== nodeId);
+    const target = candidates.reduce((best, n) =>
+      (!best || n.cpu < best.cpu) ? n : best, null);
+
+    Auth.addLog('WARN',
+      `RQNF-04 · Fallo detectado en ${node.name} — coordinador redirige tareas a ${target ? target.name : 'clúster'}`
+    );
+
+    if (target) {
+      // Subir carga del nodo receptor visualmente
+      target.cpu = Math.min(95, target.cpu + 20);
+      target.gpu = Math.min(95, target.gpu + 15);
+      _showToast(`🔁 Tolerancia a fallos: tareas de ${node.name} → ${target.name}`);
+
+      // Marcar el receptor como "redirigiendo" brevemente
+      target._redirecting = true;
+      setTimeout(() => { if (target) delete target._redirecting; }, 3200);
+    }
+
+    _render();
+  }
+
+  /* ── RQNF-04: Recuperar un nodo fallido ─────────────────── */
+  function recoverNode (nodeId) {
+    const node = _nodes.find(n => n.id === nodeId);
+    if (!node || !node.failed) return;
+    node.failed = false;
+    node.cpu = Math.floor(Math.random() * 30) + 15;
+    node.ram = Math.floor(Math.random() * 30) + 20;
+    node.gpu = Math.floor(Math.random() * 25) + 10;
+    Auth.addLog('INFO', `RQNF-04 · ${node.name} recuperado y reincorporado al clúster`);
+    _showToast(`✅ ${node.name} recuperado y en línea`);
+    _render();
+  }
+
+  /* ── Botón: forzar carga alta para ver escalado ──────────── */
+  function triggerScaleNow () {
+    // Subir métricas de los nodos base por encima del umbral de escala
+    _nodes.filter(n => !n.auto && !n.failed).forEach(n => {
+      n.cpu = Math.floor(Math.random() * 10) + 83;
+      n.gpu = Math.floor(Math.random() * 10) + 82;
+    });
+    _render();
+  }
+
+  /* ── Botón: resetear nodos extra ─────────────────────────── */
+  function resetScale () {
+    _nodes = _baseNodes.map(n => ({ ...n }));
+    _autoScaling = false;
+    Auth.addLog('INFO', 'RQNF-02 · Clúster reseteado a configuración base (3 nodos)');
+    _render();
+  }
+
+  /* ── Barra de escala horizontal ──────────────────────────── */
+  function _renderScaleBar () {
+    const dots  = document.getElementById('scale-nodes-dots');
+    const info  = document.getElementById('scale-info-text');
+    if (!dots || !info) return;
+
+    const total = _nodes.length;
+    const extra = _nodes.filter(n => n.auto).length;
+    const failed = _nodes.filter(n => n.failed).length;
+
+    dots.innerHTML = _nodes.map(n => {
+      const cls = n.failed ? 'failed' : n.auto ? 'auto' : '';
+      const title = n.failed ? `${n.name} — Fuera de línea` : n.auto ? `${n.name} — Escalado auto` : `${n.name} — Base`;
+      return `<div class="scale-node-dot ${cls}" title="${title}"></div>`;
+    }).join('');
+
+    const maxReached = extra >= 5;
+    info.textContent = `${total - extra} nodos base · ${extra} adicionales${maxReached ? ' (máx)' : ''} · ${failed} fuera de línea · máx 5 extras`;
+  }
+
+  /* ── Render principal ────────────────────────────────────── */
   function _render () {
     let anyAlert = false;
 
-    // Fluctuar
+    // Fluctuar solo nodos activos
     _nodes.forEach(n => {
-      n.cpu = _fluctuate(n.cpu, 5, 98, 10);
-      n.ram = _fluctuate(n.ram, 20, 95, 7);
-      n.gpu = _fluctuate(n.gpu, 5, 98, 12);
+      if (n.failed) return;
+      n.cpu = _fluctuate(n.cpu, 5,  98, n.auto ? 6 : 10);
+      n.ram = _fluctuate(n.ram, 20, 95, n.auto ? 5 : 7);
+      n.gpu = _fluctuate(n.gpu, 5,  98, n.auto ? 6 : 12);
 
       const isAlert = n.cpu >= 90 || n.ram >= 90 || n.gpu >= 90;
       if (isAlert) {
@@ -2534,7 +3345,6 @@ const Servers = (() => {
         if (n.ram >= 90) metrics.push(`RAM ${n.ram}%`);
         if (n.gpu >= 90) metrics.push(`GPU ${n.gpu}%`);
         const msg = `${n.name}: sobrecarga — ${metrics.join(', ')}`;
-        // Registrar en bitácora (solo si es nuevo en los últimos 30s)
         const last = _alertHistory.find(a => a.node === n.id);
         if (!last || Date.now() - last.ts > 30000) {
           Auth.addLog('WARN', msg);
@@ -2544,12 +3354,15 @@ const Servers = (() => {
       }
     });
 
-    // Banner global
+    // RQNF-02: comprobar si hay que escalar
+    _checkAndScale();
+
+    // Banner global de alertas
     const banner = document.getElementById('servers-alert-banner');
     if (anyAlert) {
       banner.classList.add('visible');
-      const alertNodes = _nodes.filter(n => n.cpu >= 90 || n.ram >= 90 || n.gpu >= 90).map(n => n.name).join(', ');
-      document.getElementById('servers-alert-msg').textContent = `⚠ Alerta: ${alertNodes} supera el 90% de capacidad.`;
+      const alertNames = _nodes.filter(n => !n.failed && (n.cpu >= 90 || n.ram >= 90 || n.gpu >= 90)).map(n => n.name).join(', ');
+      document.getElementById('servers-alert-msg').textContent = `⚠ Alerta: ${alertNames} supera el 90% de capacidad.`;
     } else {
       banner.classList.remove('visible');
     }
@@ -2561,10 +3374,38 @@ const Servers = (() => {
     // Tarjetas de nodos
     const grid = document.getElementById('servers-grid');
     if (!grid) return;
+
     grid.innerHTML = _nodes.map(n => {
-      const isAlert = n.cpu >= 90 || n.ram >= 90 || n.gpu >= 90;
+      const isAlert      = !n.failed && (n.cpu >= 90 || n.ram >= 90 || n.gpu >= 90);
+      const isNew        = !!n._new;
+      const isRedirecting = !!n._redirecting;
+
+      let cardClass = 'server-card';
+      if (n.failed)       cardClass += ' failed';
+      else if (isNew)     cardClass += ' scaled';
+      else if (n.auto)    cardClass += ' scaled';
+      else if (isAlert)   cardClass += ' alert';
+      if (isRedirecting)  cardClass += ' redirecting';
+
+      // Estado textual
+      let statusColor = 'var(--success)';
+      let statusText  = 'Operativo';
+      if (n.failed)       { statusColor = 'var(--text-muted)';  statusText = 'Fuera de línea'; }
+      else if (isAlert)   { statusColor = 'var(--danger)';      statusText = 'Sobrecarga'; }
+      else if (isRedirecting) { statusColor = 'var(--warning)'; statusText = 'Absorbiendo tareas'; }
+      else if (n.auto)    { statusColor = 'var(--primary)';     statusText = 'Escalado auto'; }
+
+      // Botones de simulación (no para nodos en escala automática caídos)
+      const simBtns = n.failed
+        ? `<div class="server-sim-btns">
+             <button class="server-sim-btn" onclick="Servers.recoverNode('${n.id}')">↺ Recuperar nodo</button>
+           </div>`
+        : `<div class="server-sim-btns">
+             <button class="server-sim-btn danger" onclick="Servers.simulateFail('${n.id}')">⚡ Simular fallo</button>
+           </div>`;
+
       return `
-        <div class="server-card ${isAlert ? 'alert' : ''}">
+        <div class="${cardClass}" id="card-${n.id}">
           <div class="server-card-header">
             <div>
               <div class="server-card-name">${n.name}</div>
@@ -2574,17 +3415,29 @@ const Servers = (() => {
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
               Alerta
             </div>
+            <div class="server-scaled-badge">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+              Auto
+            </div>
+            <div class="server-failed-badge">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              Offline
+            </div>
           </div>
-          ${_metricRow('CPU', n.cpu)}
-          ${_metricRow('RAM', n.ram)}
-          ${_metricRow('GPU', n.gpu)}
-          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);border-top:1px solid var(--border);padding-top:8px;margin-top:4px;">
+          ${_metricRow('CPU', n.cpu, n.failed)}
+          ${_metricRow('RAM', n.ram, n.failed)}
+          ${_metricRow('GPU', n.gpu, n.failed)}
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);border-top:1px solid var(--border);padding-top:6px;margin-top:2px;">
             <span>Estado</span>
-            <span style="color:${isAlert ? 'var(--danger)' : 'var(--success)'};font-weight:600;">${isAlert ? 'Sobrecarga' : 'Operativo'}</span>
+            <span style="color:${statusColor};font-weight:600;">${statusText}</span>
           </div>
+          ${simBtns}
         </div>
       `;
     }).join('');
+
+    // Barra de escala
+    _renderScaleBar();
 
     // Log de alertas
     _renderAlertLog();
@@ -2592,26 +3445,28 @@ const Servers = (() => {
 
   async function _renderAlertLog () {
     const container = document.getElementById('servers-alert-log');
-    const countEl   = document.getElementById('servers-alert-count');
+    const countEl2  = document.getElementById('servers-alert-count');
     if (!container) return;
 
-    // Tomar los WARN de la bitácora
-    const logs = (await Auth.getLogs()).filter(l => l.level === 'WARN').slice(0, 20);
-    const countEl2 = document.getElementById('servers-alert-count');
+    const logs = (await Auth.getLogs())
+      .filter(l => l.level === 'WARN' || (l.level === 'INFO' && l.msg.includes('RQNF-0')))
+      .slice(0, 30);
 
     if (!logs.length) {
-      countEl2.textContent = 'Sin alertas';
+      countEl2.textContent = 'Sin eventos';
       container.innerHTML = '<div style="padding:14px;color:var(--text-muted);font-size:12px;">No se han registrado alertas de infraestructura.</div>';
       return;
     }
 
-    countEl2.textContent = `${logs.length} alerta(s)`;
+    countEl2.textContent = `${logs.length} evento(s)`;
     container.innerHTML = logs.map(l => {
       const t = new Date(l.ts).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+      const isInfo = l.level === 'INFO';
+      const dot    = isInfo ? 'var(--primary)' : 'var(--warning)';
       return `
         <div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--border);font-size:11px;">
           <span style="color:var(--text-muted);font-family:var(--font-mono);flex-shrink:0;min-width:52px;">${t}</span>
-          <span style="width:6px;height:6px;border-radius:50%;background:var(--warning);flex-shrink:0;"></span>
+          <span style="width:6px;height:6px;border-radius:50%;background:${dot};flex-shrink:0;"></span>
           <span style="color:var(--text-secondary);flex:1;">${l.msg}</span>
         </div>
       `;
@@ -2621,9 +3476,157 @@ const Servers = (() => {
   function init () {
     _render();
     _interval = setInterval(_render, 5000);
+
+    // RQNF-03: actualizar horas de uptime estimadas en tiempo real
+    const _uptimeStart = Date.now();
+    setInterval(() => {
+      const el = document.getElementById('srv-uptime-hours');
+      if (!el) return;
+      const sessionSecs = Math.floor((Date.now() - _uptimeStart) / 1000);
+      const h = Math.floor(sessionSecs / 3600);
+      const m = Math.floor((sessionSecs % 3600) / 60);
+      const s = sessionSecs % 60;
+      el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')} esta sesion`;
+    }, 1000);
   }
 
-  return { init };
+  return { init, simulateFail, recoverNode, triggerScaleNow, resetScale };
+})();
+
+/* ══════════════════════════════════════════════════════════
+   NUCLEO DEL MODELO IA / MML — Red neuronal + Motor de inferencia
+   (simulacion visual, RQF-10). Se activa/desactiva en los mismos
+   puntos donde Chat.send() marca el paso "ps-model" del pipeline
+   (activo mientras la llamada REAL al modelo esta en curso), asi
+   que la duracion visible es siempre la latencia real, no inventada.
+   El Motor de aprendizaje y el Validador de calidad ya se simulan
+   aparte en el panel de Entrenamiento (Training) — RQNF-08.
+════════════════════════════════════════════════════════ */
+const NeuralCore = (() => {
+
+  // Topologia fija: [entrada, oculta 1, oculta 2, salida]
+  const LAYERS = [3, 6, 6, 3];
+  const VB_W = 260, VB_H = 110;
+  const PAD_X = 22;
+
+  let _stepTimer  = null;
+  let _startTs    = null;
+
+  function _layerX (li) {
+    if (LAYERS.length === 1) return VB_W / 2;
+    return PAD_X + li * ((VB_W - PAD_X * 2) / (LAYERS.length - 1));
+  }
+  function _neuronY (li, ni) {
+    const n = LAYERS[li];
+    const gap = (VB_H - 20) / (n + 1);
+    return 10 + gap * (ni + 1);
+  }
+
+  function _buildSVG () {
+    const synG = document.getElementById('nc-synapses');
+    const neuG = document.getElementById('nc-neurons');
+    if (!synG || !neuG) return;
+
+    let synHTML = '';
+    for (let li = 0; li < LAYERS.length - 1; li++) {
+      for (let a = 0; a < LAYERS[li]; a++) {
+        for (let b = 0; b < LAYERS[li + 1]; b++) {
+          const x1 = _layerX(li),     y1 = _neuronY(li, a);
+          const x2 = _layerX(li + 1), y2 = _neuronY(li + 1, b);
+          synHTML += `<line class="synapse" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+        }
+      }
+    }
+    synG.innerHTML = synHTML;
+
+    let neuHTML = '';
+    for (let li = 0; li < LAYERS.length; li++) {
+      for (let ni = 0; ni < LAYERS[li]; ni++) {
+        const x = _layerX(li), y = _neuronY(li, ni);
+        neuHTML += `<circle class="neuron l${li}" cx="${x}" cy="${y}" r="4.2"/>`;
+      }
+    }
+    neuG.innerHTML = neuHTML;
+
+    const totalNeurons = LAYERS.reduce((a, b) => a + b, 0);
+    document.getElementById('nc-layers').textContent = LAYERS.length;
+    document.getElementById('nc-neuron-count').textContent = totalNeurons;
+  }
+
+  function _setBadge (text, bg, color, border) {
+    const b = document.getElementById('nc-status-badge');
+    b.textContent = text;
+    b.style.background = bg;
+    b.style.color = color;
+    b.style.border = `1px solid ${border}`;
+  }
+
+  function _setStep (idx) {
+    document.querySelectorAll('#nc-steps .inference-step').forEach(el => {
+      const i = parseInt(el.dataset.step, 10);
+      el.classList.remove('active', 'done');
+      if (i < idx) el.classList.add('done');
+      else if (i === idx) el.classList.add('active');
+    });
+  }
+
+  function _resetSteps () {
+    document.querySelectorAll('#nc-steps .inference-step').forEach(el => el.classList.remove('active', 'done'));
+  }
+
+  /* ── Inicia el "pensamiento" — se llama justo antes de la
+     llamada real a la API. La animacion de capas + los 3 pasos
+     del motor de inferencia corren en loop mientras se espera
+     la respuesta real (no sabemos cuanto tardara). ── */
+  function start () {
+    const svg = document.getElementById('nc-svg');
+    svg.classList.remove('idle', 'done', 'error');
+    svg.classList.add('active');
+    _setBadge('Procesando…', 'var(--primary-dim)', 'var(--primary)', 'var(--primary)');
+    document.getElementById('nc-latency').textContent = '—';
+
+    _startTs = performance.now();
+    let step = 0;
+    _setStep(step);
+    _stepTimer = setInterval(() => {
+      step = (step + 1) % 3;
+      _setStep(step);
+    }, 550);
+  }
+
+  /* ── Detiene la simulacion cuando la respuesta REAL ya llego
+     (o fallo). Muestra la latencia real medida en ms. ── */
+  function stop (ok = true) {
+    clearInterval(_stepTimer);
+    _stepTimer = null;
+
+    const elapsed = _startTs ? Math.round(performance.now() - _startTs) : null;
+    document.getElementById('nc-latency').textContent = elapsed !== null ? `${elapsed} ms` : '—';
+
+    const svg = document.getElementById('nc-svg');
+    svg.classList.remove('active');
+
+    if (ok) {
+      svg.classList.add('done');
+      _setStep(3); // marca los 3 pasos como completados
+      _setBadge('Completado', 'var(--success-dim)', 'var(--success)', 'var(--success)');
+    } else {
+      svg.classList.add('error');
+      _setBadge('Error', 'var(--danger-dim)', 'var(--danger)', 'var(--danger)');
+    }
+
+    // Vuelve a reposo tras un momento, listo para la siguiente consulta
+    setTimeout(() => {
+      svg.classList.remove('done', 'error');
+      svg.classList.add('idle');
+      _resetSteps();
+      _setBadge('En reposo', 'var(--bg-elevated)', 'var(--text-muted)', 'var(--border)');
+    }, 1800);
+  }
+
+  function init () { _buildSVG(); }
+
+  return { init, start, stop };
 })();
 
 /* ══════════════════════════════════════════════════════════
@@ -2638,7 +3641,79 @@ const Chat = (() => {
   let _imgCount    = 0;
   let _fbCount     = 0;
 
+  // RQNF-01: seguimiento de tiempos de respuesta
+  let _responseTimes = [];   // ms de cada respuesta completa
+  let _timerRAF      = null; // requestAnimationFrame handle del cronómetro en vivo
+  let _sendStart     = null; // timestamp al inicio de send()
+
   const steps = ['ps-input', 'ps-proc', 'ps-conn', 'ps-model', 'ps-store', 'ps-post', 'ps-out'];
+
+  /* ── RQNF-01: Cronómetro de tiempo de respuesta ─────────────
+     - Arranca con send(), actualiza cada frame con rAF
+     - Se detiene al recibir respuesta o error
+     - <3s verde · 3-5s naranja · >5s rojo (RQNF-01 exige <3s)  */
+  function _timerStart () {
+    _sendStart = performance.now();
+    const timerEl  = document.getElementById('response-timer-live');
+    const valueEl  = document.getElementById('timer-display');
+    if (!timerEl || !valueEl) return;
+
+    timerEl.className = 'response-timer-live running';
+    valueEl.className = 'timer-value running';
+
+    function _tick () {
+      if (!_sendStart) return;
+      const elapsed = (performance.now() - _sendStart) / 1000;
+      valueEl.textContent = elapsed.toFixed(2) + ' s';
+      _timerRAF = requestAnimationFrame(_tick);
+    }
+    if (_timerRAF) cancelAnimationFrame(_timerRAF);
+    _timerRAF = requestAnimationFrame(_tick);
+  }
+
+  function _timerStop (ok = true) {
+    if (!_sendStart) return;
+    const elapsed = (performance.now() - _sendStart);
+    if (_timerRAF) { cancelAnimationFrame(_timerRAF); _timerRAF = null; }
+    _sendStart = null;
+
+    const secs     = elapsed / 1000;
+    const secsStr  = secs.toFixed(2) + ' s';
+    const cls      = secs < 3 ? 'ok' : secs < 5 ? 'warn' : 'slow';
+
+    const timerEl = document.getElementById('response-timer-live');
+    const valueEl = document.getElementById('timer-display');
+    if (timerEl) timerEl.className = `response-timer-live ${ok ? cls : 'slow'}`;
+    if (valueEl) { valueEl.textContent = ok ? secsStr : 'Error'; valueEl.className = `timer-value ${ok ? cls : 'slow'}`; }
+
+    // Acumular para promedio
+    if (ok) {
+      _responseTimes.push(elapsed);
+      _updateAvgTime();
+    }
+
+    return { elapsed, cls };
+  }
+
+  function _updateAvgTime () {
+    const avgEl = document.getElementById('stat-avg-time');
+    if (!avgEl || !_responseTimes.length) return;
+    const avg  = _responseTimes.reduce((a, b) => a + b, 0) / _responseTimes.length;
+    const secs = (avg / 1000).toFixed(2);
+    const cls  = avg < 3000 ? 'var(--success)' : avg < 5000 ? 'var(--warning)' : 'var(--danger)';
+    avgEl.textContent  = secs + ' s';
+    avgEl.style.color  = cls;
+  }
+
+  /* Genera el badge HTML para pegar debajo de cada burbuja */
+  function _timeBadge (elapsed, cls) {
+    const secs  = (elapsed / 1000).toFixed(2);
+    const label = cls === 'ok' ? '✓ <3 s — dentro del límite' : cls === 'warn' ? '⚠ 3-5 s' : '✗ >5 s — lento';
+    return `<div class="response-time-badge ${cls}">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      ${secs} s &nbsp;·&nbsp; RQNF-01 &nbsp;·&nbsp; ${label}
+    </div>`;
+  }
 
   function _pipelineReset () {
     steps.forEach(id => {
@@ -3061,6 +4136,7 @@ const Chat = (() => {
     document.getElementById('token-hint').textContent = '';
 
     _showTyping();
+    _timerStart(); // RQNF-01: arrancar cronómetro
     _pipelineReset();
     _pipelineSet(0, 'active'); // 0: Fuente de Datos
 
@@ -3086,9 +4162,11 @@ const Chat = (() => {
       Auth.addLog('INFO', 'Conexión de Datos: canal establecido hacia el Modelo IA/MML');
       _pipelineSet(2, 'done');
 
-      // 3: Modelo IA / MML — inferencia real
+      // 3: Modelo IA / MML — inferencia real (Red neuronal + Motor de inferencia simulados)
       _pipelineSet(3, 'active');
+      NeuralCore.start();
       const rawResponse = await _callGemini(text, attCopy);
+      NeuralCore.stop(true);
       _pipelineSet(3, 'done');
 
       // 4: Almacenamiento — guarda resultado + actualiza caché de modelo (poscondición CU-1)
@@ -3105,14 +4183,25 @@ const Chat = (() => {
 
       // 6: Interfaz / UI — despliega el resultado final
       _pipelineSet(6, 'active');
+      const _timeResult = _timerStop(true); // RQNF-01: parar cronómetro
       _removeTyping();
       _addMessage('assistant', formattedResponse, [], true, [], true); // isFinal=true → CU-5 | isHTML=true → postprocesado
+
+      // RQNF-01: inyectar badge de tiempo en la última burbuja del asistente
+      if (_timeResult) {
+        const lastMsg = document.querySelector('#chat-messages .message.assistant:last-child .message-content');
+        if (lastMsg) lastMsg.insertAdjacentHTML('beforeend', _timeBadge(_timeResult.elapsed, _timeResult.cls));
+        Auth.addLog('INFO', `RQNF-01 · Tiempo de respuesta: ${(_timeResult.elapsed/1000).toFixed(2)}s (${_timeResult.cls === 'ok' ? 'dentro del límite <3s' : _timeResult.cls === 'warn' ? 'aceptable 3-5s' : 'lento >5s'})`);
+      }
+
       await _delay(80);
       _pipelineSet(6, 'done');
 
       Auth.addLog('INFO', 'Respuesta recibida del modelo y presentada en Interfaz/UI');
 
     } catch (err) {
+      _timerStop(false); // RQNF-01: parar en error
+      NeuralCore.stop(false);
       _pipelineSet(3, 'error');
       _pipelineSet(6, 'active');
       await _delay(100);
@@ -3136,6 +4225,13 @@ const Chat = (() => {
 
   function clearHistory () {
     _history = []; _queryCount = 0; _imgCount = 0; _fbCount = 0; _attachments = [];
+    _responseTimes = []; // RQNF-01: resetear tiempos
+    const timerEl = document.getElementById('response-timer-live');
+    const valueEl = document.getElementById('timer-display');
+    if (timerEl) timerEl.className = 'response-timer-live';
+    if (valueEl) { valueEl.textContent = '—'; valueEl.className = 'timer-value'; }
+    const avgEl = document.getElementById('stat-avg-time');
+    if (avgEl) { avgEl.textContent = '—'; avgEl.style.color = ''; }
     _renderAttachPreview();
     _pipelineReset();
     _updateStats();
@@ -3497,27 +4593,137 @@ const Security = (() => {
     if (!tbody) return;
     const users   = await CONFIG.getUsers();
     const current = Auth.currentUser();
+    const isAdmin = Auth.can('users');
 
     document.getElementById('sec-kpi-users').textContent = users.length;
+    document.getElementById('sec-kpi-users-trend').textContent = users.length + ' en el sistema';
+
+    // Botón crear visible solo para admin
+    const btnNew = document.getElementById('sec-btn-new-user');
+    if (btnNew) btnNew.style.display = isAdmin ? '' : 'none';
 
     tbody.innerHTML = users.map(u => {
       const isMe   = current && u.id === current.id;
       const perms  = u.perms.map(p => `<span class="sec-perm-chip">${p}</span>`).join('');
       const estado = isMe
-        ? '<span class="badge badge-success" style="font-size:9px;">conectado ahora</span>'
+        ? '<span class="badge badge-success" style="font-size:9px;">conectado</span>'
         : '<span class="badge badge-muted" style="font-size:9px;">registrado</span>';
+      // Eliminar: solo admin, no seed, no a sí mismo
+      const canDel = isAdmin && !u.seed && !isMe;
+      const delBtn = canDel
+        ? `<button class="btn btn-ghost btn-sm sec-del-btn" onclick="Security.deleteUser('${u.id}')"
+             style="font-size:10px;color:var(--danger);padding:2px 6px;" title="Eliminar usuario">✕</button>`
+        : (u.seed ? '<span style="font-size:9px;color:var(--text-muted);" title="Usuario base del sistema">base</span>' : '');
       return `
         <tr>
+          <td class="font-mono" style="font-size:10px;">${u.id}</td>
           <td>${u.username}</td>
-          <td>${u.role}</td>
-          <td style="max-width:220px;">${perms}</td>
+          <td style="font-size:11px;">${u.role}</td>
+          <td style="max-width:180px;">${perms}</td>
           <td>${estado}</td>
+          <td style="text-align:center;">${delBtn}</td>
         </tr>
       `;
     }).join('');
 
     if (current) {
       document.getElementById('sec-kpi-session').textContent = `${current.username} · ${current.role}`;
+    }
+  }
+
+  /* ── Abrir / cerrar formulario de nuevo usuario ──────────── */
+  function openNewUserForm () {
+    if (!Auth.can('users')) return;
+    document.getElementById('sec-user-form').style.display = '';
+    document.getElementById('sec-new-name').value     = '';
+    document.getElementById('sec-new-username').value = '';
+    document.getElementById('sec-new-password').value = '';
+    document.getElementById('sec-new-role').value     = '';
+    const msg = document.getElementById('sec-user-form-msg');
+    msg.style.display = 'none';
+    document.getElementById('sec-new-name').focus();
+  }
+
+  function closeNewUserForm () {
+    document.getElementById('sec-user-form').style.display = 'none';
+  }
+
+  function _showToast (msg, ok) {
+    const el = document.getElementById('sec-user-toast');
+    el.textContent = msg;
+    el.style.display = '';
+    el.style.color = ok ? 'var(--success)' : 'var(--danger)';
+    el.style.background = ok ? 'var(--success-dim)' : 'var(--danger-dim)';
+    clearTimeout(_showToast._t);
+    _showToast._t = setTimeout(() => { el.style.display = 'none'; }, 3500);
+  }
+
+  /* ── Crear nuevo usuario (CU-3) ─────────────────────────── */
+  async function submitNewUser () {
+    const name     = document.getElementById('sec-new-name').value.trim();
+    const username = document.getElementById('sec-new-username').value.trim();
+    const password = document.getElementById('sec-new-password').value;
+    const role     = document.getElementById('sec-new-role').value;
+    const msgEl    = document.getElementById('sec-user-form-msg');
+
+    msgEl.style.display = 'none';
+
+    if (!name || !username || !password || !role) {
+      msgEl.textContent   = 'Complete todos los campos antes de guardar.';
+      msgEl.style.display = '';
+      return;
+    }
+    if (password.length < 6) {
+      msgEl.textContent   = 'La contrasena debe tener al menos 6 caracteres.';
+      msgEl.style.display = '';
+      return;
+    }
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+      msgEl.textContent   = 'El usuario solo puede contener letras, numeros y guion bajo.';
+      msgEl.style.display = '';
+      return;
+    }
+
+    const exists = await CONFIG.usernameExists(username);
+    if (exists) {
+      msgEl.textContent   = `El usuario "${username}" ya existe en el sistema.`;
+      msgEl.style.display = '';
+      return;
+    }
+
+    const btn = document.querySelector('#sec-user-form .btn-primary');
+    if (btn) btn.disabled = true;
+
+    try {
+      const newUser = await CONFIG.createUser({ name, username, password, role });
+      Auth.addLog('INFO', `Usuario creado: ${newUser.username} (${newUser.role}) — por ${Auth.currentUser()?.username}`);
+      closeNewUserForm();
+      _showToast(`✓ Usuario "${newUser.username}" creado correctamente (${newUser.id})`, true);
+      await _renderUsers();
+    } catch (err) {
+      msgEl.textContent   = 'Error al crear el usuario: ' + err.message;
+      msgEl.style.display = '';
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  }
+
+  /* ── Eliminar usuario (CU-3) ─────────────────────────────── */
+  async function deleteUser (id) {
+    if (!Auth.can('users')) return;
+    const users = await CONFIG.getUsers();
+    const u = users.find(x => x.id === id);
+    if (!u) return;
+    if (!confirm(`¿Eliminar el usuario "${u.username}" (${u.role})?
+Esta accion no se puede deshacer.`)) return;
+
+    const ok = await CONFIG.deleteUser(id);
+    if (ok) {
+      Auth.addLog('WARN', `Usuario eliminado: ${u.username} (${u.id}) — por ${Auth.currentUser()?.username}`);
+      _showToast(`Usuario "${u.username}" eliminado del sistema.`, false);
+      await _renderUsers();
+    } else {
+      _showToast('No se pudo eliminar: los usuarios base del sistema no pueden eliminarse.', false);
     }
   }
 
@@ -3636,7 +4842,7 @@ const Security = (() => {
     }, 5000);
   }
 
-  return { init, decryptPreview, filterLogs, testBlockedDomain };
+  return { init, decryptPreview, filterLogs, testBlockedDomain, openNewUserForm, closeNewUserForm, submitNewUser, deleteUser };
 })();
 
 /* ══════════════════════════════════════════════════════════
@@ -4248,6 +5454,7 @@ const InterfazUI = (() => {
 ════════════════════════════════════════════════════════ */
 Auth.addLog('INFO', 'Dashboard cargado');
 Dashboard.init();
+NeuralCore.init();
 FuenteDatos.init();
 Procesamiento.init();
 ConexionDatos.init();
@@ -4292,6 +5499,624 @@ if (_elDbModel) _elDbModel.textContent = _modelId;
     background: var(--bg-elevated);
     color: var(--text-primary);
   }
+</style>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FASE 2 — Red neuronal animada en panel de Entrenamiento
+     Visualización SVG de capas + pulsos por época + métricas
+     en tiempo real. Extiende Training.start() via monkey-patch.
+════════════════════════════════════════════════════════════ -->
+<script>
+(function () {
+
+  /* ── Arquitectura de la red: [entradas, oculta1, oculta2, salidas] ── */
+  const LAYERS = [4, 5, 5, 3];
+  const COLS   = [28, 93, 158, 232];   // x de cada columna en el viewBox 260×130
+  const ROW_H  = 110;                  // altura util para neuronas
+
+  /* Colores usando las CSS vars del sistema */
+  const C_IDLE    = 'var(--border)';
+  const C_ACTIVE  = 'var(--primary)';
+  const C_PASS    = 'var(--success)';
+  const C_FAIL    = 'var(--danger)';
+  const C_EDGE    = 'var(--border)';
+  const C_EDGE_FW = 'var(--primary)';
+
+  let _neurons = [];   // [{el, cx, cy, layerIdx, neuronIdx}]
+  let _edges   = [];   // [{el, from, to}]
+  let _built   = false;
+
+  /* ── Construir el SVG una sola vez ──────────────────────── */
+  function _build () {
+    if (_built) return;
+    _built = true;
+
+    const svgNeurons = document.getElementById('nn-neurons');
+    const svgEdges   = document.getElementById('nn-edges');
+    if (!svgNeurons || !svgEdges) return;
+
+    svgNeurons.innerHTML = '';
+    svgEdges.innerHTML   = '';
+    _neurons = [];
+    _edges   = [];
+
+    // Posiciones
+    const positions = LAYERS.map((count, li) => {
+      const spacing = ROW_H / (count + 1);
+      return Array.from({ length: count }, (_, ni) => ({
+        x: COLS[li],
+        y: 10 + spacing * (ni + 1),
+        li, ni,
+      }));
+    });
+
+    // Edges primero (detrás de neuronas)
+    for (let li = 0; li < LAYERS.length - 1; li++) {
+      for (const from of positions[li]) {
+        for (const to of positions[li + 1]) {
+          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line.setAttribute('x1', from.x);
+          line.setAttribute('y1', from.y);
+          line.setAttribute('x2', to.x);
+          line.setAttribute('y2', to.y);
+          line.setAttribute('stroke', C_EDGE);
+          line.setAttribute('stroke-width', '0.7');
+          svgEdges.appendChild(line);
+          _edges.push({ el: line, fromL: li, fromN: from.ni, toL: li + 1, toN: to.ni });
+        }
+      }
+    }
+
+    // Neuronas encima
+    for (let li = 0; li < LAYERS.length; li++) {
+      for (const pos of positions[li]) {
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', pos.x);
+        circle.setAttribute('cy', pos.y);
+        circle.setAttribute('r', li === 0 || li === LAYERS.length - 1 ? 5 : 6);
+        circle.setAttribute('fill', 'var(--bg-elevated)');
+        circle.setAttribute('stroke', C_IDLE);
+        circle.setAttribute('stroke-width', '1.2');
+        svgNeurons.appendChild(circle);
+        _neurons.push({ el: circle, cx: pos.x, cy: pos.y, li: pos.li, ni: pos.ni });
+      }
+    }
+  }
+
+  /* ── Resetear colores al estado idle ───────────────────── */
+  function _resetViz () {
+    _neurons.forEach(n => {
+      n.el.setAttribute('stroke', C_IDLE);
+      n.el.setAttribute('fill', 'var(--bg-elevated)');
+    });
+    _edges.forEach(e => {
+      e.el.setAttribute('stroke', C_EDGE);
+      e.el.setAttribute('stroke-width', '0.7');
+      e.el.setAttribute('opacity', '0.5');
+    });
+    const lbl = document.getElementById('nn-layer-label');
+    if (lbl) lbl.textContent = 'idle';
+    ['nn-loss','nn-acc','nn-epoch'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.textContent = '—'; el.style.color = ''; }
+    });
+  }
+
+  /* ── Animar propagación forward por capas ──────────────── */
+  async function _forwardPass (accuracy, threshold) {
+    const delay = ms => new Promise(r => setTimeout(r, ms));
+
+    for (let li = 0; li < LAYERS.length; li++) {
+      const layerNames = ['Entrada', 'Oculta 1', 'Oculta 2', 'Salida'];
+      const lbl = document.getElementById('nn-layer-label');
+      if (lbl) lbl.textContent = `procesando: ${layerNames[li]}`;
+
+      // Activar neuronas de esta capa
+      const layerNeurons = _neurons.filter(n => n.li === li);
+      layerNeurons.forEach(n => {
+        n.el.setAttribute('stroke', C_ACTIVE);
+        n.el.setAttribute('fill', 'var(--primary-dim)');
+      });
+
+      // Activar edges que salen de esta capa
+      if (li < LAYERS.length - 1) {
+        _edges.filter(e => e.fromL === li).forEach(e => {
+          e.el.setAttribute('stroke', C_EDGE_FW);
+          e.el.setAttribute('stroke-width', '1.2');
+          e.el.setAttribute('opacity', '0.9');
+        });
+      }
+
+      await delay(110);
+
+      // Apagar capa anterior (si no es la última)
+      if (li > 0) {
+        _neurons.filter(n => n.li === li - 1).forEach(n => {
+          n.el.setAttribute('stroke', C_PASS);
+          n.el.setAttribute('fill', 'var(--success-dim)');
+        });
+        _edges.filter(e => e.fromL === li - 1).forEach(e => {
+          e.el.setAttribute('stroke', C_EDGE);
+          e.el.setAttribute('stroke-width', '0.7');
+          e.el.setAttribute('opacity', '0.4');
+        });
+      }
+    }
+
+    // Color final capa de salida según resultado
+    const ok = accuracy >= threshold;
+    _neurons.filter(n => n.li === LAYERS.length - 1).forEach(n => {
+      n.el.setAttribute('stroke', ok ? C_PASS : C_FAIL);
+      n.el.setAttribute('fill', ok ? 'var(--success-dim)' : 'var(--danger-dim)');
+    });
+
+    const lbl = document.getElementById('nn-layer-label');
+    if (lbl) lbl.textContent = ok ? '✓ aprobado' : '✗ rechazado';
+  }
+
+  /* ── Actualizar métricas en el panel ───────────────────── */
+  function _setMetrics (loss, acc, epoch, total, threshold) {
+    const lossEl  = document.getElementById('nn-loss');
+    const accEl   = document.getElementById('nn-acc');
+    const epochEl = document.getElementById('nn-epoch');
+
+    if (lossEl)  lossEl.textContent  = loss;
+    if (accEl)   {
+      accEl.textContent = acc + '%';
+      accEl.style.color = acc >= threshold ? 'var(--success)' : (acc >= threshold * 0.85 ? 'var(--warning)' : 'var(--danger)');
+    }
+    if (epochEl) epochEl.textContent = `${epoch}/${total}`;
+  }
+
+  /* ── Monkey-patch de Training.start() ─────────────────── */
+  const _origStart = Training.start.bind(Training);
+
+  Training.start = async function () {
+    // Obtener parámetros del formulario antes de llamar al original
+    const epochs    = parseInt(document.getElementById('training-epochs').value) || 10;
+    const threshold = parseInt(document.getElementById('training-threshold').value) || 90;
+    const dataset   = document.getElementById('training-dataset').value;
+
+    // Validar igual que el original: si no hay dataset, dejar que el original rechace
+    if (!dataset) { _origStart(); return; }
+
+    // Construir SVG si no está construido
+    _build();
+    _resetViz();
+
+    // Lanzar el original en paralelo — él maneja el log, progreso y caché
+    // Nosotros interceptamos cada época via polling de los KPIs
+    const startPromise = _origStart();
+
+    // Animar por época sincronizado con el tiempo del original (~300-500ms/época)
+    let lastEpochText = '';
+    const epochInterval = setInterval(async () => {
+      const counterEl = document.getElementById('training-epoch-counter');
+      if (!counterEl) { clearInterval(epochInterval); return; }
+
+      const text = counterEl.textContent; // "Epoca X / Y"
+      if (text === lastEpochText || text === 'Epoca 0 / 0') return;
+      lastEpochText = text;
+
+      const m = text.match(/Epoca (\d+) \/ (\d+)/);
+      if (!m) return;
+      const epoch = parseInt(m[1]);
+      const total = parseInt(m[2]);
+
+      // Leer accuracy del log para esta época
+      const logLines = document.querySelectorAll('#training-log .training-log-line');
+      const lastLine = logLines[logLines.length - 1];
+      let acc = 0;
+      let loss = '—';
+      if (lastLine) {
+        const am = lastLine.textContent.match(/accuracy:\s*(\d+)%/);
+        const lm = lastLine.textContent.match(/loss:\s*([\d.]+)/);
+        if (am) acc = parseInt(am[1]);
+        if (lm) loss = lm[1];
+      }
+
+      _setMetrics(loss, acc, epoch, total, threshold);
+      await _forwardPass(acc, threshold);
+
+    }, 200);
+
+    // Cuando el original termina, limpiar el intervalo
+    await startPromise;
+    clearInterval(epochInterval);
+
+    // Estado final
+    const accEl = document.getElementById('accuracy-value');
+    const finalAcc = accEl ? parseInt(accEl.textContent) || 0 : 0;
+    _setMetrics('—', finalAcc, epochs, epochs, threshold);
+    await _forwardPass(finalAcc, threshold);
+  };
+
+  /* ── Monkey-patch de Training.reset() ─────────────────── */
+  const _origReset = Training.reset.bind(Training);
+  Training.reset = function () {
+    _origReset();
+    if (_built) _resetViz();
+  };
+
+  /* ── Construir SVG al cargar la página (idle) ──────────── */
+  // Esperar a que el DOM esté listo
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => { _build(); _resetViz(); });
+  } else {
+    _build();
+    _resetViz();
+  }
+
+})();
+
+/* ── RQNF-12: Conformidad normativa ─────────────────────── */
+const NormativaCheck = (() => {
+
+  const _principles = [
+    { name: 'Finalidad',        desc: 'Datos usados solo para IA / MML'     },
+    { name: 'Libertad',         desc: 'Acceso y supresión garantizados'      },
+    { name: 'Veracidad',        desc: 'Datos verificados antes de procesar'  },
+    { name: 'Transparencia',    desc: 'Políticas de tratamiento visibles'    },
+    { name: 'Seguridad',        desc: 'AES-256-GCM · sesión cifrada'         },
+    { name: 'Confidencialidad', desc: 'Acceso restringido por rol (CU-3)'    },
+  ];
+
+  const _steps = [
+    'Verificando cifrado en reposo (AES-256-GCM)…',
+    'Revisando control de acceso por roles…',
+    'Comprobando bitácora de auditoría (RQNF-10)…',
+    'Validando whitelist de dominios (RQNF-14)…',
+    'Confirmando principio de finalidad — uso exclusivo IA/MML…',
+    'Verificando sesiones cifradas y expiración de token…',
+    'Revisando política de retención de datos (máx. 500 registros)…',
+    '✓ Sistema conforme con Ley 1581 de 2012 y RGPD.',
+  ];
+
+  function init () {
+    const container = document.getElementById('norm-principles');
+    if (!container) return;
+    container.innerHTML = _principles.map(p => `
+      <div style="display:flex;align-items:flex-start;gap:8px;
+                  background:var(--bg-elevated);border:1px solid var(--border);
+                  border-radius:var(--radius-md);padding:8px 10px;">
+        <span style="color:var(--success);font-size:13px;line-height:1.5;">✓</span>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--text-primary);">${p.name}</div>
+          <div style="font-size:11px;color:var(--text-muted);">${p.desc}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function verify () {
+    const btn = document.getElementById('sec-norm-btn');
+    const log = document.getElementById('norm-log');
+    if (!log || !btn) return;
+
+    btn.disabled    = true;
+    btn.textContent = '⟳ Verificando…';
+    log.style.display = 'block';
+    log.innerHTML   = '';
+
+    for (let i = 0; i < _steps.length; i++) {
+      await new Promise(r => setTimeout(r, 400));
+      const line = document.createElement('div');
+      const isLast = i === _steps.length - 1;
+      line.style.color = isLast ? 'var(--success)' : 'var(--text-secondary)';
+      line.textContent = `[${new Date().toLocaleTimeString()}]  ${_steps[i]}`;
+      log.appendChild(line);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    // Reforzar badges como confirmados
+    ['norm-1581-badge', 'norm-rgpd-badge'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = '✓ Conforme';
+    });
+
+    Auth.addLog('INFO', 'RQNF-12 · Verificación de conformidad completada (Ley 1581 / RGPD)');
+
+    btn.disabled    = false;
+    btn.textContent = '✓ Verificado';
+    setTimeout(() => { btn.textContent = '⟳ Verificar conformidad'; }, 5000);
+  }
+
+  init();
+  return { verify };
+
+})();
+</script>
+
+<!-- Estilos Fase 2 — Red Neuronal -->
+<style>
+  /* Pulso en neuronas activas */
+  @keyframes nnPulse {
+    0%   { r: 6; }
+    50%  { r: 7.5; }
+    100% { r: 6; }
+  }
+
+  /* Transición suave en colores del SVG */
+  #nn-svg circle, #nn-svg line {
+    transition: stroke 0.15s ease, fill 0.15s ease, opacity 0.15s ease;
+  }
+
+  /* Métricas: flash al actualizar */
+  @keyframes metricFlash {
+    from { background: var(--primary-dim); }
+    to   { background: var(--bg-elevated); }
+  }
+  #nn-loss, #nn-acc, #nn-epoch {
+    transition: color 0.3s ease;
+  }
+</style>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FASE 1 — Auto-simulación continua de los 4 subsistemas
+     Activa el flujo automático cuando se entra al panel y lo
+     pausa al salir. Cada panel "vive" solo durante la demo.
+════════════════════════════════════════════════════════════ -->
+<script>
+(function () {
+
+  /* ── Intervalos activos — se limpian al cambiar de panel ── */
+  const _timers = {};
+
+  function _clearAll () {
+    Object.values(_timers).forEach(t => clearInterval(t));
+    Object.keys(_timers).forEach(k => delete _timers[k]);
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     FUENTE DE DATOS — auto-ingesta cada 4 s cuando está activo
+     + indicador de "flujo en vivo"
+  ══════════════════════════════════════════════════════════ */
+  function _startFuente () {
+    // Inicializar con 3 registros de arranque para que no esté vacío
+    FuenteDatos.simulate();
+    setTimeout(() => FuenteDatos.simulate(), 700);
+    setTimeout(() => FuenteDatos.simulate(), 1400);
+
+    // Luego auto-ingesta cada 4 segundos
+    _timers.fuente = setInterval(() => {
+      FuenteDatos.simulate();
+    }, 4000);
+
+    // Indicador de latencia en vivo en la barra de fuentes externas
+    _timers.fuentePulse = setInterval(() => {
+      document.querySelectorAll('.fd-source-meta').forEach(el => {
+        const m = el.textContent.match(/(\d+) ms/);
+        if (m) {
+          const delta = Math.floor(Math.random() * 20) - 10;
+          const newLatency = Math.max(10, parseInt(m[1]) + delta);
+          el.textContent = el.textContent.replace(/\d+ ms/, newLatency + ' ms');
+        }
+      });
+    }, 2000);
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     PROCESAMIENTO — procesa un registro cada 3.5 s
+     + animación de carga en la barra de pipeline
+  ══════════════════════════════════════════════════════════ */
+  function _startProcesamiento () {
+    // Arranque inmediato
+    Procesamiento.processNext();
+    setTimeout(() => Procesamiento.processNext(), 1200);
+
+    // Luego un registro cada 3.5 segundos
+    _timers.proc = setInterval(() => {
+      Procesamiento.processNext();
+    }, 3500);
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     CONEXION DE DATOS — envía un paquete cada 3 s
+     + throughput en tiempo real fluctuante
+  ══════════════════════════════════════════════════════════ */
+  function _startConexion () {
+    ConexionDatos.sendPacket();
+    setTimeout(() => ConexionDatos.sendPacket(), 1000);
+
+    _timers.cx = setInterval(() => {
+      ConexionDatos.sendPacket();
+    }, 3000);
+
+    // Simular fluctuación de throughput en el KPI aunque no se envíe paquete
+    _timers.cxThroughput = setInterval(() => {
+      const el = document.getElementById('cx-kpi-throughput');
+      if (!el || el.textContent === '— Mb/s') return;
+      const current = parseFloat(el.textContent) || 5;
+      const next = Math.max(1, current + (Math.random() * 2 - 1)).toFixed(2);
+      el.textContent = next + ' Mb/s';
+    }, 1500);
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     ALMACENAMIENTO — refresca los datos cada 5 s y muestra
+     un indicador de escritura activa
+  ══════════════════════════════════════════════════════════ */
+  function _startAlmacen () {
+    // Refresh inmediato
+    Almacenamiento.refresh();
+
+    // Refrescar cada 5 segundos para mostrar nuevos resultados
+    _timers.almacen = setInterval(() => {
+      Almacenamiento.refresh();
+
+      // Pulso visual: resaltar brevemente el KPI de tamaño
+      const sizeEl = document.getElementById('al-kpi-size');
+      if (sizeEl) {
+        sizeEl.style.color = 'var(--primary)';
+        setTimeout(() => { sizeEl.style.color = ''; }, 600);
+      }
+    }, 5000);
+
+    // Indicador de escritura: parpadeo en el título de "BD de Resultados"
+    _timers.almacenPulse = setInterval(() => {
+      const dot = document.getElementById('al-write-dot');
+      if (dot) dot.style.opacity = dot.style.opacity === '0' ? '1' : '0';
+    }, 800);
+
+    // Inyectar el punto de escritura si no existe
+    const bdTitle = document.querySelector('#panel-almacen .card-title');
+    if (bdTitle && !document.getElementById('al-write-dot')) {
+      const dot = document.createElement('span');
+      dot.id = 'al-write-dot';
+      dot.style.cssText = 'display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--success);margin-left:8px;transition:opacity 0.4s;';
+      dot.title = 'Escrituras activas en reposo cifrado (AES-256-GCM)';
+      bdTitle.appendChild(dot);
+    }
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     Interceptar UI.navigate para activar/pausar según panel
+  ══════════════════════════════════════════════════════════ */
+  const _originalNavigate = UI.navigate;
+
+  UI.navigate = function (el) {
+    _originalNavigate.call(UI, el);
+    _clearAll();
+
+    const view = el?.dataset?.view;
+    if (view === 'fuente')         _startFuente();
+    else if (view === 'procesamiento') _startProcesamiento();
+    else if (view === 'conexion')   _startConexion();
+    else if (view === 'almacen')    _startAlmacen();
+  };
+
+  /* ── Activar si el panel ya está visible al cargar (ej: deep link) ── */
+  const _activePanel = document.querySelector('.view-panel.active');
+  if (_activePanel) {
+    const id = _activePanel.id.replace('panel-', '');
+    if (id === 'fuente')         _startFuente();
+    else if (id === 'procesamiento') _startProcesamiento();
+    else if (id === 'conexion')   _startConexion();
+    else if (id === 'almacen')    _startAlmacen();
+  }
+
+})();
+
+/* ── RQNF-15: Latencia y ancho de banda de red ──────────── */
+const NetMonitor = (() => {
+
+  // Prefijos de IDs de cada widget RQNF-15 según su panel.
+  // 'cx'  → panel-conexion (widget original)
+  // 'srv' → panel-servers
+  // 'tr'  → panel-training
+  // 'sec' → panel-security
+  const _prefixes = ['cx', 'srv', 'tr', 'sec'];
+
+  function _applyToWidget (prefix, lat, bw, latOk, bwOk, allOk) {
+    const noteText = allOk
+      ? 'Latencia y throughput dentro del umbral'
+      : `${!latOk ? `Latencia ${lat} ms (excede 100 ms) ` : ''}${!bwOk ? `Throughput ${bw} Mb/s (bajo 10 Mb/s)` : ''}`;
+
+    const latVal = document.getElementById(`${prefix}-lat-val`);
+    const latBar = document.getElementById(`${prefix}-lat-bar`);
+    const bwVal  = document.getElementById(`${prefix}-bw-val`);
+    const bwBar  = document.getElementById(`${prefix}-bw-bar`);
+    const stateEl = document.getElementById(`${prefix}-net-state`);
+    const noteEl  = document.getElementById(`${prefix}-net-note`);
+    const badgeEl = document.getElementById(`${prefix}-net-badge`);
+
+    if (latVal) { latVal.textContent = `${lat} ms`;  latVal.style.color = latOk ? 'var(--success)' : 'var(--danger)'; }
+    if (latBar) { latBar.style.width = `${Math.min(100, lat)}%`; latBar.style.background = latOk ? 'var(--success)' : 'var(--danger)'; }
+    if (bwVal)  { bwVal.textContent = `${bw} Mb/s`; bwVal.style.color = bwOk ? 'var(--success)' : 'var(--danger)'; }
+    if (bwBar)  { bwBar.style.width = `${Math.min(100, (bw / 20) * 100)}%`; bwBar.style.background = bwOk ? 'var(--success)' : 'var(--danger)'; }
+    if (stateEl) { stateEl.textContent = allOk ? 'Red apta ✓' : 'Fuera de umbral ✗'; stateEl.style.color = allOk ? 'var(--success)' : 'var(--danger)'; }
+    if (noteEl)  { noteEl.textContent = noteText; }
+    if (badgeEl) {
+      badgeEl.textContent      = allOk ? 'CUMPLE' : 'ALERTA';
+      badgeEl.style.background = allOk ? 'var(--success-dim)' : 'var(--danger-dim)';
+      badgeEl.style.color      = allOk ? 'var(--success)'     : 'var(--danger)';
+      badgeEl.style.borderColor = allOk ? 'rgba(16,185,129,.3)' : 'rgba(239,68,68,.3)';
+    }
+  }
+
+  function _update () {
+    // Latencia oscila 8–118 ms para que pueda verse OK y en alerta
+    const lat = Math.round(8 + Math.random() * 110);
+
+    // Throughput: toma el valor del KPI ya existente si hay paquetes,
+    // o simula uno propio
+    const existingBw = parseFloat(
+      document.getElementById('cx-kpi-throughput')?.textContent
+    );
+    const bw = isNaN(existingBw)
+      ? +(8 + Math.random() * 8).toFixed(2)
+      : existingBw;
+
+    const latOk = lat < 100;
+    const bwOk  = bw  >= 10;
+    const allOk = latOk && bwOk;
+
+    // Actualizar todos los widgets RQNF-15 con los mismos valores
+    _prefixes.forEach(prefix => _applyToWidget(prefix, lat, bw, latOk, bwOk, allOk));
+  }
+
+  _update();
+  setInterval(_update, 4000);
+
+})();
+</script>
+
+<!-- Estilos de auto-simulación Fase 1 -->
+<style>
+  /* Fila nueva en tablas — flash al aparecer */
+  @keyframes fdRowAppear {
+    from { background: var(--primary-dim); }
+    to   { background: transparent; }
+  }
+  .fd-row-new td { animation: fdRowAppear 1.2s ease forwards; }
+
+  /* Etapa del pipeline procesamiento — estados */
+  .pr-stage.active .pr-stage-icon { color: var(--primary); animation: psPulse 0.8s ease infinite alternate; }
+  .pr-stage.done   .pr-stage-icon { color: var(--success); }
+  .pr-stage.error  .pr-stage-icon { color: var(--danger); }
+  @keyframes psPulse { from { opacity: 0.5; } to { opacity: 1; } }
+
+  /* Nodo de conexión — active = viaja el paquete */
+  .cx-node.cx-active {
+    border-color: var(--primary) !important;
+    color: var(--primary) !important;
+    box-shadow: 0 0 10px var(--primary-dim);
+    transform: scale(1.05);
+  }
+  .cx-node.cx-passed {
+    border-color: var(--success) !important;
+    color: var(--success) !important;
+  }
+
+  /* Punto de escritura activa Almacenamiento */
+  #al-write-dot { vertical-align: middle; }
+
+  /* Gestión de usuarios CU-3 */
+  .sec-del-btn {
+    opacity: 0.5;
+    transition: opacity 0.15s, color 0.15s;
+  }
+  .sec-del-btn:hover { opacity: 1; }
+
+  #sec-user-form {
+    animation: slideDown 0.18s ease;
+  }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  #sec-user-toast {
+    animation: fadeIn 0.2s ease;
+    border-radius: 0;
+    font-weight: 500;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; } to { opacity: 1; }
+  }
+
+  /* Log de procesamiento — colores */
+  .pr-log-line.pr-log-error { color: var(--danger); }
 </style>
 
 </body>
